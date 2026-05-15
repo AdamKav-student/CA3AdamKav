@@ -6,6 +6,14 @@ RenderManager::RenderManager()
 {
 	view.reset(sf::FloatRect(0, 0, 1280, 720));
 	WindowManager::sInstance->setView(view);
+	
+	// Initialize background sprite
+	TexturePtr backgroundTexture = TextureManager::sInstance->GetTexture("background");
+	if (backgroundTexture)
+	{
+		mBackgroundSprite.setTexture(*backgroundTexture);
+		mBackgroundSprite.setPosition(0, 0);
+	}
 }
 
 
@@ -67,6 +75,9 @@ void RenderManager::Render()
 	// Clear the back buffer
 	//
 	WindowManager::sInstance->clear(sf::Color(100, 149, 237, 255));
+
+	// Draw background first`
+	WindowManager::sInstance->draw(mBackgroundSprite);
 
 	RenderManager::sInstance->RenderComponents();
 
