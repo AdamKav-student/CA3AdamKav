@@ -13,13 +13,19 @@ bool Client::StaticInit()
 	
 
 	HUD::StaticInit();
+	MenuManager::StaticInit();
 
 	s_instance.reset(client);
+
+	// Set up menu buttons after everything is initialized
+	Client* clientPtr = static_cast<Client*>(s_instance.get());
+	clientPtr->InitializeMenuButtons();
 
 	return true;
 }
 
 Client::Client()
+	: mInMenu(true)
 {
 	GameObjectRegistry::sInstance->RegisterCreationFunction('RCAT', RoboCatClient::StaticCreate);
 	GameObjectRegistry::sInstance->RegisterCreationFunction('MOUS', MouseClient::StaticCreate);
@@ -35,33 +41,84 @@ Client::Client()
 	//NetworkManagerClient::sInstance->SetSimulatedLatency(0.0f);
 }
 
+void Client::InitializeMenuButtons()
+{
+	MenuManager::sInstance->AddButton(sf::FloatRect(490, 250, 300, 80), "Start Game", [this]() {
+		StartGame();
+	});
 
+	MenuManager::sInstance->AddButton(sf::FloatRect(490, 380, 300, 80), "Settings", []() {
+		// Settings functionality
+	});
+
+	MenuManager::sInstance->AddButton(sf::FloatRect(490, 510, 300, 80), "Quit", []() {
+		Engine::s_instance->SetShouldKeepRunning(false);
+	});
+}
+
+void Client::StartGame()
+{
+	mInMenu = false;
+}
 
 void Client::DoFrame()
 {
 	InputManager::sInstance->Update();
 
-	Engine::DoFrame();
+	if (mInMenu)
+	{
+		// Just render the menu, don't process game logic
+		WindowManager::sInstance->clear(sf::Color(100, 149, 237, 255));
+		MenuManager::sInstance->Render();
+		WindowManager::sInstance->display();
+	}
+	else
+	{
+		Engine::DoFrame();
 
-	NetworkManagerClient::sInstance->ProcessIncomingPackets();
+		NetworkManagerClient::sInstance->ProcessIncomingPackets();
 
-	RenderManager::sInstance->Render();
+		RenderManager::sInstance->Render();
 
-	NetworkManagerClient::sInstance->SendOutgoingPackets();
+		NetworkManagerClient::sInstance->SendOutgoingPackets();
+	}
 }
 
 void Client::HandleEvent(sf::Event& p_event)
 {
-	switch (p_event.type)
+	if (mInMenu)
 	{
-	case sf::Event::KeyPressed:
-		InputManager::sInstance->HandleInput(EIA_Pressed, p_event.key.code);
-		break;
-	case sf::Event::KeyReleased:
-		InputManager::sInstance->HandleInput(EIA_Released, p_event.key.code);
-		break;
-	default:
-		break;
+		switch (p_event.type)
+		{
+		case sf::Event::MouseButtonPressed:
+		{
+			sf::Vector2f mousePos(static_cast<float>(p_event.mouseButton.x), static_cast<float>(p_event.mouseButton.y));
+			MenuManager::sInstance->HandleMouseClick(mousePos);
+			break;
+		}
+		case sf::Event::MouseMoved:
+		{
+			sf::Vector2f mousePos(static_cast<float>(p_event.mouseMove.x), static_cast<float>(p_event.mouseMove.y));
+			MenuManager::sInstance->HandleMouseMove(mousePos);
+			break;
+		}
+		default:
+			break;
+		}
+	}
+	else
+	{
+		switch (p_event.type)
+		{
+		case sf::Event::KeyPressed:
+			InputManager::sInstance->HandleInput(EIA_Pressed, p_event.key.code);
+			break;
+		case sf::Event::KeyReleased:
+			InputManager::sInstance->HandleInput(EIA_Released, p_event.key.code);
+			break;
+		default:
+			break;
+		}
 	}
 }
 

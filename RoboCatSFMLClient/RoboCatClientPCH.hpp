@@ -15,7 +15,7 @@
 #include "YarnClient.hpp"
 
 #include "HUD.hpp"
-
+#include "MenuManager.hpp"
 
 #include "ReplicationManagerClient.hpp"
 #include "NetworkManagerClient.hpp"

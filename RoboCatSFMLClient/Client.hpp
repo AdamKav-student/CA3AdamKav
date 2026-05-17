@@ -13,5 +13,8 @@ protected:
 	virtual bool	PollEvent(sf::Event& p_event) override;
 
 private:
-
+	bool mInMenu;
+	
+	void StartGame();
+	void InitializeMenuButtons();
 };
