@@ -25,8 +25,16 @@ TextureManager::TextureManager()
 
 	CacheTexture("background", "../Assets/background.png");
 
-	//Menu background
-	CacheTexture("menu_background", "../Assets/Headless.png");
+	//Menu backgrounds
+	CacheTexture("menu_background", "../Assets/Menu New.png");
+	CacheTexture("instructions_background", "../Assets/Settings new.png");
+
+	//Menu button images
+	CacheTexture("button_play", "../Assets/Play.png");
+	CacheTexture("button_info", "../Assets/Question.png");
+
+	//Instructions/Rules/Controls image
+	CacheTexture("instructions_image", "../Assets/Instructions.png");
 }
 
 TexturePtr	TextureManager::GetTexture(const string& inTextureName)

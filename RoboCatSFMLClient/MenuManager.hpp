@@ -4,36 +4,51 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <string>
+
+enum MenuState
+{
+	MENU_MAIN,
+	MENU_INSTRUCTIONS
+};
 
 struct Button
 {
-    sf::FloatRect bounds;
-    std::string label;
-    std::function<void()> onClick;
-    bool hovered;
+	sf::FloatRect bounds;
+	std::function<void()> onClick;
+	bool hovered;
+	sf::Sprite sprite;
+	std::string textureName;
 
-    Button(const sf::FloatRect& b, const std::string& l)
-        : bounds(b), label(l), hovered(false) {}
+	Button(const sf::FloatRect& b, const std::string& texName = "")
+		: bounds(b), hovered(false), textureName(texName) {}
 };
 
 class MenuManager
 {
 public:
-    static void StaticInit();
-    static std::unique_ptr<MenuManager> sInstance;
+	static void StaticInit();
+	static std::unique_ptr<MenuManager> sInstance;
 
-    void Render();
-    void HandleMouseClick(const sf::Vector2f& mousePos);
-    void HandleMouseMove(const sf::Vector2f& mousePos);
+	void Render();
+	void HandleMouseClick(const sf::Vector2f& mousePos);
+	void HandleMouseMove(const sf::Vector2f& mousePos);
 
-    void AddButton(const sf::FloatRect& bounds, const std::string& label, std::function<void()> onClick);
-    void SetButtonCallback(const std::string& label, std::function<void()> onClick);
+	void AddButton(const sf::FloatRect& bounds, const std::string& textureKey, std::function<void()> onClick);
+	void SetMenuState(MenuState state) { mCurrentState = state; }
+	MenuState GetMenuState() const { return mCurrentState; }
 
 private:
-    MenuManager();
+	MenuManager();
 
-    std::vector<Button> mButtons;
-    sf::Color mButtonColor;
-    sf::Color mButtonHoverColor;
-    sf::Color mButtonTextColor;
+	std::vector<Button> mMainMenuButtons;
+	std::vector<Button> mInstructionsMenuButtons;
+
+	sf::Sprite mBackgroundSprite;
+	sf::Sprite mInstructionsBackgroundSprite;
+	sf::Sprite mInstructionsSprite;
+	MenuState mCurrentState;
+
+	void RenderMainMenu();
+	void RenderInstructions();
 };

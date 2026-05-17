@@ -43,17 +43,24 @@ Client::Client()
 
 void Client::InitializeMenuButtons()
 {
-	MenuManager::sInstance->AddButton(sf::FloatRect(490, 250, 300, 80), "Start Game", [this]() {
+	// Main Menu Buttons
+	// Play button - top left
+	MenuManager::sInstance->AddButton(sf::FloatRect(220, 320, 200, 90), "button_play", [this]() {
 		StartGame();
 	});
 
-	MenuManager::sInstance->AddButton(sf::FloatRect(490, 380, 300, 80), "Settings", []() {
-		// Settings functionality
+	MenuManager::sInstance->AddButton(sf::FloatRect(860, 320, 200, 90), "button_info", [this]() {
+		MenuManager::sInstance->SetMenuState(MENU_INSTRUCTIONS);
 	});
 
-	MenuManager::sInstance->AddButton(sf::FloatRect(490, 510, 300, 80), "Quit", []() {
-		Engine::s_instance->SetShouldKeepRunning(false);
+	// Instructions Menu - Back Button (Play button) on right side
+	MenuManager::sInstance->SetMenuState(MENU_INSTRUCTIONS);
+	MenuManager::sInstance->AddButton(sf::FloatRect(1160, 660, 100, 50), "button_play", [this]() {
+		MenuManager::sInstance->SetMenuState(MENU_MAIN);
 	});
+
+	// Set back to main menu state
+	MenuManager::sInstance->SetMenuState(MENU_MAIN);
 }
 
 void Client::StartGame()
@@ -67,10 +74,9 @@ void Client::DoFrame()
 
 	if (mInMenu)
 	{
-		// Just render the menu, don't process game logic
+		// Menu is rendered by MenuManager
 		WindowManager::sInstance->clear(sf::Color(100, 149, 237, 255));
 		MenuManager::sInstance->Render();
-		WindowManager::sInstance->display();
 	}
 	else
 	{
@@ -126,5 +132,3 @@ bool Client::PollEvent(sf::Event& p_event)
 {
 	return WindowManager::sInstance->pollEvent(p_event);
 }
-
-

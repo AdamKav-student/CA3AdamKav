@@ -14,7 +14,7 @@ protected:
 
 private:
 	bool mInMenu;
-	
+
 	void StartGame();
 	void InitializeMenuButtons();
 };
