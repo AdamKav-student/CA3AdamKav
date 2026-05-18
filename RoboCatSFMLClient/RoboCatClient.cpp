@@ -282,3 +282,50 @@ void RoboCatClient::DoClientSidePredictionAfterReplicationForRemoteCat(uint32_t 
 	}
 }
 
+void RoboCatClient::ProcessCollisionsWithScreenWalls()
+{
+	Vector3 location = GetLocation();
+	float x = location.mX;
+	float y = location.mY;
+
+	float vx = mVelocity.mX;
+	float vy = mVelocity.mY;
+
+	float radius = GetCollisionRadius();
+
+	// Get background bounds from render manager
+	sf::FloatRect bgBounds = RenderManager::sInstance->GetBackgroundBounds();
+	
+	float minX = bgBounds.left;
+	float maxX = bgBounds.left + bgBounds.width;
+	float minY = bgBounds.top;
+	float maxY = bgBounds.top + bgBounds.height;
+
+	// Constrain movement to background image bounds
+	if ((x + radius) >= maxX && vx > 0)
+	{
+		mVelocity.mX = -vx * mWallRestitution;
+		location.mX = maxX - radius;
+		SetLocation(location);
+	}
+	else if ((x - radius) <= minX && vx < 0)
+	{
+		mVelocity.mX = -vx * mWallRestitution;
+		location.mX = minX + radius;
+		SetLocation(location);
+	}
+
+	if ((y + radius) >= maxY && vy > 0)
+	{
+		mVelocity.mY = -vy * mWallRestitution;
+		location.mY = maxY - radius;
+		SetLocation(location);
+	}
+	else if ((y - radius) <= minY && vy < 0)
+	{
+		mVelocity.mY = -vy * mWallRestitution;
+		location.mY = minY + radius;
+		SetLocation(location);
+	}
+}
+

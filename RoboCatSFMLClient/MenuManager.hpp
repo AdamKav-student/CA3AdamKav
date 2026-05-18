@@ -14,14 +14,16 @@ enum MenuState
 
 struct Button
 {
-	sf::FloatRect bounds;
+	// baseBounds are the coordinates provided in base 1280x720 layout
+	sf::FloatRect baseBounds;
+	sf::FloatRect bounds; // scaled bounds for current window
 	std::function<void()> onClick;
 	bool hovered;
 	sf::Sprite sprite;
 	std::string textureName;
 
-	Button(const sf::FloatRect& b, const std::string& texName = "")
-		: bounds(b), hovered(false), textureName(texName) {}
+	Button(const sf::FloatRect& baseB, const std::string& texName = "")
+		: baseBounds(baseB), bounds(baseB), onClick(nullptr), hovered(false), textureName(texName) {}
 };
 
 class MenuManager
@@ -34,7 +36,8 @@ public:
 	void HandleMouseClick(const sf::Vector2f& mousePos);
 	void HandleMouseMove(const sf::Vector2f& mousePos);
 
-	void AddButton(const sf::FloatRect& bounds, const std::string& textureKey, std::function<void()> onClick);
+	// Add button with base coords (for 1280x720 layout)
+	void AddButton(const sf::FloatRect& baseBounds, const std::string& textureKey, std::function<void()> onClick);
 	void SetMenuState(MenuState state) { mCurrentState = state; }
 	MenuState GetMenuState() const { return mCurrentState; }
 
@@ -48,6 +51,9 @@ private:
 	sf::Sprite mInstructionsBackgroundSprite;
 	sf::Sprite mInstructionsSprite;
 	MenuState mCurrentState;
+
+	// recompute layout for current window size
+	void UpdateLayout();
 
 	void RenderMainMenu();
 	void RenderInstructions();
