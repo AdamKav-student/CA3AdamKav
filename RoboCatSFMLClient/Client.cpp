@@ -118,7 +118,15 @@ void Client::HandleEvent(sf::Event& p_event)
 		switch (p_event.type)
 		{
 		case sf::Event::KeyPressed:
-			InputManager::sInstance->HandleInput(EIA_Pressed, p_event.key.code);
+			// Allow Escape to quit the application while playing
+			if (p_event.key.code == sf::Keyboard::Escape)
+			{
+				Engine::s_instance->SetShouldKeepRunning(false);
+			}
+			else
+			{
+				InputManager::sInstance->HandleInput(EIA_Pressed, p_event.key.code);
+			}
 			break;
 		case sf::Event::KeyReleased:
 			InputManager::sInstance->HandleInput(EIA_Released, p_event.key.code);
