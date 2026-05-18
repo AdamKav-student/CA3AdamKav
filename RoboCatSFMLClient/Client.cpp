@@ -49,6 +49,7 @@ void Client::InitializeMenuButtons()
 		StartGame();
 	});
 
+	// Info button - top right
 	MenuManager::sInstance->AddButton(sf::FloatRect(860, 320, 200, 90), "button_info", [this]() {
 		MenuManager::sInstance->SetMenuState(MENU_INSTRUCTIONS);
 	});

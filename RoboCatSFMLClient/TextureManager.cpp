@@ -34,7 +34,7 @@ TextureManager::TextureManager()
 	CacheTexture("button_info", "../Assets/Question.png");
 
 	//Instructions/Rules/Controls image
-	CacheTexture("instructions_image", "../Assets/Instructions.png");
+	CacheTexture("instructions_image", "../Assets/Control text.png");
 }
 
 TexturePtr	TextureManager::GetTexture(const string& inTextureName)
