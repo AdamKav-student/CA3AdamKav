@@ -3,8 +3,19 @@
 
 YarnClient::YarnClient()
 {
+	// Set client-side scale and collision radius so it's visible
+	SetScale(0.6f);
+	SetCollisionRadius(10.f);
+
 	mSpriteComponent.reset(new SpriteComponent(this));
 	mSpriteComponent->SetTexture(TextureManager::sInstance->GetTexture("yarn"));
+	mSpriteComponent->SetDrawOrder(10); // draw after background (background default 0)
+
+	// ensure sprite is fully opaque and visible
+	mSpriteComponent->GetSprite().setColor(sf::Color(255,255,255,255));
+
+	// debug log
+	//LOG("YarnClient created at scale %f", GetScale());
 }
 
 
@@ -44,6 +55,9 @@ void YarnClient::Read(InputMemoryBitStream& inInputStream)
 	{
 		inInputStream.Read(mPlayerId, 8);
 	}
+
+	// debug: ensure sprite position updated
+	//LOG("YarnClient Read - loc (%f,%f) rot %f", GetLocation().mX, GetLocation().mY, GetRotation());
 
 }
 

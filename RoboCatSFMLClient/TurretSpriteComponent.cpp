@@ -1,11 +1,24 @@
 #include "RoboCatClientPCH.hpp"
 
-TurretSpriteComponent::TurretSpriteComponent(GameObject* inGameObject) : SpriteComponent(inGameObject), mOffset(Vector3::Zero)
+TurretSpriteComponent::TurretSpriteComponent(GameObject* inGameObject) : SpriteComponent(inGameObject), mOffset(Vector3::Zero), mOriginYOffset(0.f), mOriginAdjusted(false)
 {
 }
 
 sf::Sprite& TurretSpriteComponent::GetSprite()
 {
+    // Ensure origin adjusted once after texture is set
+    if (!mOriginAdjusted)
+    {
+        auto tex = m_sprite.getTexture();
+        if (tex)
+        {
+            sf::Vector2u tSize = tex->getSize();
+            // default origin already center; lower origin by mOriginYOffset pixels
+            m_sprite.setOrigin(tSize.x / 2.f, tSize.y / 2.f + mOriginYOffset);
+        }
+        mOriginAdjusted = true;
+    }
+
     // Position turret relative to the base game object location
     auto pos = mGameObject->GetLocation();
     float baseRot = mGameObject->GetRotation(); // degrees

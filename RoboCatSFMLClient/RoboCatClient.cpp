@@ -7,11 +7,14 @@ RoboCatClient::RoboCatClient() :
 {
 	mSpriteComponent.reset(new PlayerSpriteComponent(this));
 	mSpriteComponent->SetTexture(TextureManager::sInstance->GetTexture("cat"));
+	mSpriteComponent->SetDrawOrder(5);
 
 	// Add turret component
 	mTurretComponent = new TurretSpriteComponent(this);
 	mTurretComponent->SetTexture(TextureManager::sInstance->GetTexture("cat_turret"));
 	mTurretComponent->SetOffset(Vector3(0.f, -10.f, 0.f)); // adjust as needed
+	mTurretComponent->SetOriginYOffset(20.f); // lower pivot by 20 pixels
+	mTurretComponent->SetDrawOrder(6);
 
 }
 

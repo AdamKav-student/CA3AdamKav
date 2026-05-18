@@ -62,6 +62,11 @@ int RenderManager::GetComponentIndex(SpriteComponent* inComponent) const
 //render the cameras in order
 void RenderManager::RenderComponents()
 {
+	// sort components by draw order so background stays behind projectiles etc.
+	sort(mComponents.begin(), mComponents.end(), [](SpriteComponent* a, SpriteComponent* b) {
+		return a->GetDrawOrder() < b->GetDrawOrder();
+	});
+
 	//Get the logical viewport so we can pass this to the SpriteComponents when it's draw time
 	for (SpriteComponent* c : mComponents)
 	{	

@@ -20,6 +20,12 @@ void SpriteComponent::SetTexture(TexturePtr inTexture)
 	m_sprite.setTexture(*inTexture);
 	m_sprite.setOrigin(tSize.x / 2, tSize.y / 2);
 	m_sprite.setScale(sf::Vector2f(1.f * mGameObject->GetScale(), 1.f * mGameObject->GetScale()));
+
+	// if texture indicates a projectile ("yarn"), set draw order low so it's drawn above background
+	if (inTexture && inTexture->getSize().x > 0)
+	{
+		// no-op but kept for extension
+	}
 }
 
 sf::Sprite& SpriteComponent::GetSprite()

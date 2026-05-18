@@ -22,7 +22,7 @@ TextureManager::TextureManager()
 	CacheTexture("mouse", "../Assets/OilDrum.png");
 
 	//Projectile
-	CacheTexture("yarn", "../Assets/missile.png");
+	CacheTexture("yarn", "../Assets/yarn.png");
 
 	CacheTexture("background", "../Assets/background.png");
 

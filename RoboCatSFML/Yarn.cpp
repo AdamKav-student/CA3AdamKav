@@ -5,8 +5,9 @@ Yarn::Yarn() :
 	mVelocity(Vector3::Zero),
 	mPlayerId(0)
 {
-	SetScale(GetScale() * 0.25f);
-	SetCollisionRadius(20.f);
+	// increase visible size
+	SetScale(GetScale() * 0.6f);
+	SetCollisionRadius(10.f);
 }
 
 
@@ -80,11 +81,17 @@ void Yarn::InitFromShooter(RoboCat* inShooter)
 	SetColor(inShooter->GetColor());
 	SetPlayerId(inShooter->GetPlayerId());
 
-	Vector3 forward = inShooter->GetForwardVector();
-	SetVelocity(inShooter->GetVelocity() + forward * mMuzzleSpeed);
-	SetLocation(inShooter->GetLocation() /* + forward * 0.55f */);
+	Vector3 forward = inShooter->GetTurretForwardVector();
+	// set spawn a bit in front of the turret based on shooter's collision radius
+	float spawnOffset = inShooter->GetCollisionRadius() + 10.f;
+	SetLocation(inShooter->GetLocation() + forward * spawnOffset);
 
-	SetRotation(inShooter->GetRotation());
+	SetVelocity(inShooter->GetVelocity() + forward * mMuzzleSpeed);
+
+	// compute rotation from forward
+	float rad = atan2f(forward.mY, forward.mX);
+	float deg = rad * 180.0f / 3.14159265f;
+	SetRotation(deg);
 }
 
 void Yarn::Update()
