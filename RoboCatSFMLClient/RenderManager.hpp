@@ -15,9 +15,6 @@ public:
 	void RemoveComponent(SpriteComponent* inComponent);
 	int	 GetComponentIndex(SpriteComponent* inComponent) const;
 
-	// Get background sprite bounds for constraining player movement
-	sf::FloatRect GetBackgroundBounds() const;
-
 private:
 
 	RenderManager();
@@ -30,3 +27,6 @@ private:
 
 
 };
+
+
+	

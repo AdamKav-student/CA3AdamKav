@@ -16,8 +16,6 @@ public:
 protected:
 	RoboCatClient();
 
-	// Override to constrain movement to background image
-	virtual void ProcessCollisionsWithScreenWalls() override;
 
 private:
 	void InterpolateClientSidePrediction(float inOldRotation, const Vector3& inOldLocation, const Vector3& inOldVelocity, bool inIsForRemoteCat);

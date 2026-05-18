@@ -26,7 +26,7 @@ public:
 	void SimulateMovement(float inDeltaTime);
 
 	void ProcessCollisions();
-	virtual void ProcessCollisionsWithScreenWalls();
+	void ProcessCollisionsWithScreenWalls();
 
 	void		SetPlayerId(uint32_t inPlayerId) { mPlayerId = inPlayerId; }
 	uint32_t	GetPlayerId()						const { return mPlayerId; }
@@ -40,8 +40,6 @@ public:
 	Vector3 GetTurretForwardVector() const;
 
 	void SetTurretRotation(float inRot) { mTurretRotation = inRot; } // add setter
-
-	void SetWorldSize(float inWidth, float inHeight);
 
 protected:
 	RoboCat();

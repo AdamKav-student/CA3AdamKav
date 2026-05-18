@@ -4,9 +4,7 @@ std::unique_ptr< RenderManager >	RenderManager::sInstance;
 
 RenderManager::RenderManager()
 {
-	// make the view match desktop resolution
-	auto dm = sf::VideoMode::getDesktopMode();
-	view.reset(sf::FloatRect(0, 0, static_cast<float>(dm.width), static_cast<float>(dm.height)));
+	view.reset(sf::FloatRect(0, 0, 1280, 720));
 	WindowManager::sInstance->setView(view);
 	
 	// Initialize background sprite
@@ -15,12 +13,6 @@ RenderManager::RenderManager()
 	{
 		mBackgroundSprite.setTexture(*backgroundTexture);
 		mBackgroundSprite.setPosition(0, 0);
-		// scale background to fit
-		auto bounds = mBackgroundSprite.getLocalBounds();
-		float scaleX = static_cast<float>(dm.width) / bounds.width;
-		float scaleY = static_cast<float>(dm.height) / bounds.height;
-		float scale = (scaleX < scaleY) ? scaleX : scaleY;
-		mBackgroundSprite.setScale(scale, scale);
 	}
 }
 
@@ -101,9 +93,4 @@ void RenderManager::Render()
 	//
 	WindowManager::sInstance->display();
 
-}
-
-sf::FloatRect RenderManager::GetBackgroundBounds() const
-{
-	return mBackgroundSprite.getGlobalBounds();
 }
