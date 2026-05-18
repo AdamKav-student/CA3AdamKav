@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClInclude Include="Client.hpp" />
     <ClInclude Include="FontManager.hpp" />
-    <ClInclude Include="GameStateManager.hpp" />
     <ClInclude Include="HUD.hpp" />
     <ClInclude Include="InputManager.hpp" />
     <ClInclude Include="MenuManager.hpp" />
@@ -42,7 +41,6 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientMain.cpp" />
     <ClCompile Include="FontManager.cpp" />
-    <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="MenuManager.cpp" />

@@ -15,8 +15,8 @@ TextureManager::TextureManager()
 	
 
 	//Model for Axis Team Chassis and Turret
-	CacheTexture("panzer", "../Assets/Panzer IV B.png");
-	CacheTexture("panzer_turret", "../Assets/Panzer IV T.png");
+	//CacheTexture("cat", "../Assets/Panzer IV B.png");
+	//CacheTexture("cat", "../Assets/Panzer IV T.png");
 
 	//Collectable - planned to restore Health 
 	CacheTexture("mouse", "../Assets/OilDrum.png");
@@ -36,10 +36,6 @@ TextureManager::TextureManager()
 
 	//Instructions/Rules/Controls image
 	CacheTexture("instructions_image", "../Assets/Control text.png");
-
-	//Victory/Defeat screens
-	CacheTexture("victory", "../Assets/Victory.png");
-	CacheTexture("defeat", "../Assets/Defeat.png");
 }
 
 TexturePtr	TextureManager::GetTexture(const string& inTextureName)
