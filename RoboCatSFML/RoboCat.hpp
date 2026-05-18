@@ -36,6 +36,11 @@ public:
 
 	virtual uint32_t	Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyState) const override;
 
+	float GetTurretRotation() const { return mTurretRotation; }
+	Vector3 GetTurretForwardVector() const;
+
+	void SetTurretRotation(float inRot) { mTurretRotation = inRot; } // add setter
+
 protected:
 	RoboCat();
 
@@ -67,6 +72,9 @@ protected:
 	int					mHealth;
 
 	bool				mIsShooting;
+
+	float			mTurretRotation;
+	float			mMaxTurretRotationSpeed;
 };
 
 typedef shared_ptr< RoboCat >	RoboCatPtr;

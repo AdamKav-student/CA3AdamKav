@@ -1,3 +1,5 @@
+#include "TurretSpriteComponent.hpp"
+
 class RoboCatClient : public RoboCat
 {
 public:
@@ -17,9 +19,10 @@ protected:
 
 private:
 	void InterpolateClientSidePrediction(float inOldRotation, const Vector3& inOldLocation, const Vector3& inOldVelocity, bool inIsForRemoteCat);
-	float				mTimeLocationBecameOutOfSync;
-	float				mTimeVelocityBecameOutOfSync;
+	float			mTimeLocationBecameOutOfSync;
+	float			mTimeVelocityBecameOutOfSync;
 
 	SpriteComponentPtr	mSpriteComponent;
+	TurretSpriteComponent* mTurretComponent; // owned
 };
 

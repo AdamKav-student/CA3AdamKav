@@ -56,6 +56,18 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 	case sf::Keyboard::S:
 		UpdateDesireFloatFromKey(inInputAction, mCurrentState.mDesiredBackAmount);
 		break;
+	case sf::Keyboard::Left:
+		if (inInputAction == EIA_Pressed)
+			mCurrentState.mDesiredTurretAmount = -1.f;
+		else if (inInputAction == EIA_Released)
+			mCurrentState.mDesiredTurretAmount = 0.f;
+		break;
+	case sf::Keyboard::Right:
+		if (inInputAction == EIA_Pressed)
+			mCurrentState.mDesiredTurretAmount = 1.f;
+		else if (inInputAction == EIA_Released)
+			mCurrentState.mDesiredTurretAmount = 0.f;
+		break;
 	case sf::Keyboard::K:
 		UpdateDesireVariableFromKey(inInputAction, mCurrentState.mIsShooting);
 		break;
@@ -83,6 +95,7 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 		break;
 	}
 	}
+
 
 }
 

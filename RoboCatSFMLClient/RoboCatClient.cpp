@@ -2,10 +2,17 @@
 
 RoboCatClient::RoboCatClient() :
 	mTimeLocationBecameOutOfSync(0.f),
-	mTimeVelocityBecameOutOfSync(0.f)
+	mTimeVelocityBecameOutOfSync(0.f),
+	mTurretComponent(nullptr)
 {
 	mSpriteComponent.reset(new PlayerSpriteComponent(this));
 	mSpriteComponent->SetTexture(TextureManager::sInstance->GetTexture("cat"));
+
+	// Add turret component
+	mTurretComponent = new TurretSpriteComponent(this);
+	mTurretComponent->SetTexture(TextureManager::sInstance->GetTexture("cat_turret"));
+	mTurretComponent->SetOffset(Vector3(0.f, -10.f, 0.f)); // adjust as needed
+
 }
 
 void RoboCatClient::HandleDying()
@@ -92,6 +99,11 @@ void RoboCatClient::Read(InputMemoryBitStream& inInputStream)
 
 		inInputStream.Read(replicatedRotation);
 		SetRotation(replicatedRotation);
+
+		// read turret rotation replicated from server
+		float replicatedTurretRotation;
+		inInputStream.Read(replicatedTurretRotation);
+		SetTurretRotation(replicatedTurretRotation);
 
 		readState |= ECRS_Pose;
 	}

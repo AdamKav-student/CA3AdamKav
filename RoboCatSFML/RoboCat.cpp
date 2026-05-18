@@ -13,9 +13,17 @@ RoboCat::RoboCat() :
 	mThrustDir(0.f),
 	mPlayerId(0),
 	mIsShooting(false),
-	mHealth(10)
+	mHealth(10),
+	mTurretRotation(0.f),
+	mMaxTurretRotationSpeed(90.f)
 {
 	SetCollisionRadius(60.f);
+}
+
+Vector3 RoboCat::GetTurretForwardVector() const
+{
+	float rad = GetTurretRotation() * 3.14159265f / 180.0f;
+	return Vector3(cosf(rad), sinf(rad), 0.f);
 }
 
 void RoboCat::ProcessInput(float inDeltaTime, const InputState& inInputState)
@@ -30,7 +38,20 @@ void RoboCat::ProcessInput(float inDeltaTime, const InputState& inInputState)
 	float inputForwardDelta = inInputState.GetDesiredVerticalDelta();
 	mThrustDir = inputForwardDelta;
 
+	// turret control
+	mTurretRotation += inInputState.GetDesiredTurretDelta() * mMaxTurretRotationSpeed * inDeltaTime;
 
+	// normalize turret angle to [0,360)
+	if (mTurretRotation < 0.f)
+	{
+		mTurretRotation += 360.f;
+	}
+	else if (mTurretRotation >= 360.f)
+	{
+		mTurretRotation = fmodf(mTurretRotation, 360.f);
+	}
+
+	//mIsShooting set from input
 	mIsShooting = inInputState.IsShooting();
 
 }
@@ -204,6 +225,9 @@ uint32_t RoboCat::Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 
 		inOutputStream.Write(GetRotation());
 
+		// write turret rotation as additional pose data
+		inOutputStream.Write(mTurretRotation);
+
 		writtenState |= ECRS_Pose;
 	}
 	else
@@ -248,8 +272,10 @@ uint32_t RoboCat::Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 
 	return writtenState;
 
-
 }
+
+
+
 
 
 

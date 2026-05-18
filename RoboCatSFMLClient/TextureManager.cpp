@@ -11,7 +11,8 @@ TextureManager::TextureManager()
 {
 	//Model for Allied Team Chassis and Turret
 	CacheTexture("cat", "../Assets/Sherman B.png");
-	//CacheTexture("cat", "../Assets/Sherman T.png");
+	CacheTexture("cat_turret", "../Assets/Sherman T.png");
+	
 
 	//Model for Axis Team Chassis and Turret
 	//CacheTexture("cat", "../Assets/Panzer IV B.png");
