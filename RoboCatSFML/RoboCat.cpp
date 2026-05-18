@@ -1,7 +1,14 @@
 #include "RoboCatPCH.hpp"
 
-const float WORLD_HEIGHT = 1420.f;
-const float WORLD_WIDTH = 2280.f;
+// World size defaults; can be updated at runtime
+static float WORLD_HEIGHT = 1420.f;
+static float WORLD_WIDTH = 2280.f;
+
+void SetWorldSize(float inWidth, float inHeight)
+{
+	WORLD_WIDTH = inWidth;
+	WORLD_HEIGHT = inHeight;
+}
 
 RoboCat::RoboCat() :
 	GameObject(),
@@ -273,6 +280,7 @@ uint32_t RoboCat::Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 	return writtenState;
 
 }
+
 
 
 
