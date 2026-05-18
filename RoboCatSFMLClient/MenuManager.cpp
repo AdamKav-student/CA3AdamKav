@@ -1,103 +1,88 @@
 #include "RoboCatClientPCH.hpp"
-#include <algorithm>
 
 std::unique_ptr<MenuManager> MenuManager::sInstance;
-
-// recompute layout (implementation)
-void MenuManager::UpdateLayout()
-{
-	if (!WindowManager::sInstance)
-		return;
-
-	auto size = WindowManager::sInstance->getSize();
-	float screenW = static_cast<float>(size.x);
-	float screenH = static_cast<float>(size.y);
-
-	const float baseW = 1280.f;
-	const float baseH = 720.f;
-	float scaleX = screenW / baseW;
-	float scaleY = screenH / baseH;
-	float uniformScale = std::min(scaleX, scaleY);
-
-	// background
-	TexturePtr bg = TextureManager::sInstance->GetTexture("menu_background");
-	if (bg)
-	{
-		mBackgroundSprite.setTexture(*bg);
-		auto tb = mBackgroundSprite.getLocalBounds();
-		float sX = screenW / tb.width;
-		float sY = screenH / tb.height;
-		float s = std::min(sX, sY);
-		mBackgroundSprite.setScale(s, s);
-		mBackgroundSprite.setPosition((screenW - tb.width * s) / 2.f, (screenH - tb.height * s) / 2.f);
-	}
-
-	// instructions background
-	TexturePtr ibg = TextureManager::sInstance->GetTexture("instructions_background");
-	if (ibg)
-	{
-		mInstructionsBackgroundSprite.setTexture(*ibg);
-		auto tb = mInstructionsBackgroundSprite.getLocalBounds();
-		float sX = screenW / tb.width;
-		float sY = screenH / tb.height;
-		float s = std::min(sX, sY);
-		mInstructionsBackgroundSprite.setScale(s, s);
-		mInstructionsBackgroundSprite.setPosition((screenW - tb.width * s) / 2.f, (screenH - tb.height * s) / 2.f);
-	}
-
-	// instructions image
-	TexturePtr inst = TextureManager::sInstance->GetTexture("instructions_image");
-	if (inst)
-	{
-		mInstructionsSprite.setTexture(*inst);
-		auto tb = mInstructionsSprite.getLocalBounds();
-		float targetW = screenW * 0.94f;
-		float targetH = screenH * 0.9f;
-		float sX = targetW / tb.width;
-		float sY = targetH / tb.height;
-		float s = std::min(sX, sY);
-		mInstructionsSprite.setScale(s, s);
-		mInstructionsSprite.setPosition((screenW - tb.width * s) / 2.f, (screenH - tb.height * s) / 2.f);
-	}
-
-	// Update button scaled bounds and sprites
-	auto updateButtons = [&](std::vector<Button>& list)
-	{
-		for (auto& b : list)
-		{
-			b.bounds.left = b.baseBounds.left * uniformScale;
-			b.bounds.top = b.baseBounds.top * uniformScale;
-			b.bounds.width = b.baseBounds.width * uniformScale;
-			b.bounds.height = b.baseBounds.height * uniformScale;
-
-			if (b.sprite.getTexture())
-			{
-				b.sprite.setPosition(b.bounds.left, b.bounds.top);
-				b.sprite.setScale(b.bounds.width / b.sprite.getLocalBounds().width, b.bounds.height / b.sprite.getLocalBounds().height);
-			}
-		}
-	};
-
-	updateButtons(mMainMenuButtons);
-	updateButtons(mInstructionsMenuButtons);
-}
 
 MenuManager::MenuManager()
 	: mCurrentState(MENU_MAIN)
 {
-	// Defer layout update to UpdateLayout which will use actual window size
+	// Initialize background sprite
+	TexturePtr backgroundTexture = TextureManager::sInstance->GetTexture("menu_background");
+	if (backgroundTexture)
+	{
+		mBackgroundSprite.setTexture(*backgroundTexture);
+		// Scale to fit screen
+		float textureWidth = mBackgroundSprite.getLocalBounds().width;
+		float textureHeight = mBackgroundSprite.getLocalBounds().height;
+		
+		if (textureWidth > 0 && textureHeight > 0)
+		{
+			float scaleX = 1280.0f / textureWidth;
+			float scaleY = 720.0f / textureHeight;
+			float scale = (scaleX < scaleY) ? scaleX : scaleY;
+			mBackgroundSprite.setScale(scale, scale);
+			
+			// Center the sprite
+			float scaledWidth = textureWidth * scale;
+			float scaledHeight = textureHeight * scale;
+			mBackgroundSprite.setPosition((1280.0f - scaledWidth) / 2.0f, (720.0f - scaledHeight) / 2.0f);
+		}
+	}
+
+	// Initialize instructions background sprite
+	TexturePtr instructionsBackgroundTexture = TextureManager::sInstance->GetTexture("instructions_background");
+	if (instructionsBackgroundTexture)
+	{
+		mInstructionsBackgroundSprite.setTexture(*instructionsBackgroundTexture);
+		// Scale to fit screen
+		float textureWidth = mInstructionsBackgroundSprite.getLocalBounds().width;
+		float textureHeight = mInstructionsBackgroundSprite.getLocalBounds().height;
+		
+		if (textureWidth > 0 && textureHeight > 0)
+		{
+			float scaleX = 1280.0f / textureWidth;
+			float scaleY = 720.0f / textureHeight;
+			float scale = (scaleX < scaleY) ? scaleX : scaleY;
+			mInstructionsBackgroundSprite.setScale(scale, scale);
+			
+			// Center the sprite
+			float scaledWidth = textureWidth * scale;
+			float scaledHeight = textureHeight * scale;
+			mInstructionsBackgroundSprite.setPosition((1280.0f - scaledWidth) / 2.0f, (720.0f - scaledHeight) / 2.0f);
+		}
+	}
+
+	// Initialize instructions sprite
+	TexturePtr instructionsTexture = TextureManager::sInstance->GetTexture("instructions_image");
+	if (instructionsTexture)
+	{
+		mInstructionsSprite.setTexture(*instructionsTexture);
+		// Scale to fit screen - scale up if needed
+		float textureWidth = mInstructionsSprite.getLocalBounds().width;
+		float textureHeight = mInstructionsSprite.getLocalBounds().height;
+		
+		if (textureWidth > 0 && textureHeight > 0)
+		{
+			float scaleX = 1200.0f / textureWidth;  // Leave 40px margin
+			float scaleY = 650.0f / textureHeight;  // Leave space for button
+			float scale = (scaleX < scaleY) ? scaleX : scaleY;
+			mInstructionsSprite.setScale(scale, scale);
+			
+			// Center the sprite
+			float scaledWidth = textureWidth * scale;
+			float scaledHeight = textureHeight * scale;
+			mInstructionsSprite.setPosition((1280.0f - scaledWidth) / 2.0f, (680.0f - scaledHeight) / 2.0f);
+		}
+	}
 }
 
 void MenuManager::StaticInit()
 {
 	sInstance.reset(new MenuManager());
-	// initial layout update
-	sInstance->UpdateLayout();
 }
 
-void MenuManager::AddButton(const sf::FloatRect& baseBounds, const std::string& textureKey, std::function<void()> onClick)
+void MenuManager::AddButton(const sf::FloatRect& bounds, const std::string& textureKey, std::function<void()> onClick)
 {
-	Button button(baseBounds, textureKey);
+	Button button(bounds, textureKey);
 	button.onClick = onClick;
 
 	// Load the texture for this button
@@ -105,19 +90,20 @@ void MenuManager::AddButton(const sf::FloatRect& baseBounds, const std::string& 
 	if (buttonTexture)
 	{
 		button.sprite.setTexture(*buttonTexture);
+		button.sprite.setPosition(bounds.left, bounds.top);
+		// Scale button image to fit button bounds
+		button.sprite.setScale(bounds.width / button.sprite.getLocalBounds().width,
+		                        bounds.height / button.sprite.getLocalBounds().height);
 	}
 
 	// Add to appropriate menu based on current state
 	if (mCurrentState == MENU_MAIN)
 	{
 		mMainMenuButtons.push_back(button);
-		// ensure layout updated
-		sInstance->UpdateLayout();
 	}
 	else if (mCurrentState == MENU_INSTRUCTIONS)
 	{
 		mInstructionsMenuButtons.push_back(button);
-		sInstance->UpdateLayout();
 	}
 }
 
@@ -207,9 +193,6 @@ void MenuManager::RenderInstructions()
 
 void MenuManager::Render()
 {
-	// Ensure layout matches current window (handles resize and initialization order)
-	UpdateLayout();
-
 	// Clear the back buffer
 	WindowManager::sInstance->clear(sf::Color(50, 50, 50, 255));
 
