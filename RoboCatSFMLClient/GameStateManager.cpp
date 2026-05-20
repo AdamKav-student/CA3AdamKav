@@ -1,4 +1,5 @@
 #include "RoboCatClientPCH.hpp"
+#include "GameStateManager.hpp"
 
 std::unique_ptr<GameStateManager> GameStateManager::sInstance;
 
