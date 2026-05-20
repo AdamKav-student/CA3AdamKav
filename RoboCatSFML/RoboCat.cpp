@@ -22,8 +22,10 @@ RoboCat::RoboCat() :
 
 Vector3 RoboCat::GetTurretForwardVector() const
 {
-	float rad = GetTurretRotation() * 3.14159265f / 180.0f;
-	return Vector3(cosf(rad), sinf(rad), 0.f);
+	// Use same rotation convention as GameObject::GetForwardVector so
+	// turret forward matches the displayed turret rotation.
+	float rad = RoboMath::ToRadians(mTurretRotation);
+	return Vector3(sinf(rad), -cosf(rad), 0.f);
 }
 
 void RoboCat::ProcessInput(float inDeltaTime, const InputState& inInputState)
@@ -273,9 +275,3 @@ uint32_t RoboCat::Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 	return writtenState;
 
 }
-
-
-
-
-
-
