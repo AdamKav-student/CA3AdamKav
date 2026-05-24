@@ -1,4 +1,20 @@
 #include "RoboCatClientPCH.hpp"
+#include "AudioManager.hpp"          
+
+static void InitAudio()
+{
+	auto& audio = AudioManager::Instance();
+	audio.LoadSoundEffect(SoundEffect::ButtonClick, "Assets/Sound/Confirmation.wav");
+	audio.LoadSoundEffect(SoundEffect::PlayerMove, "Assets/Sound/Player_Start.wav");
+	audio.LoadSoundEffect(SoundEffect::WeaponFire, "Assets/Sound/Player_Fire.wav");
+	audio.LoadSoundEffect(SoundEffect::ItemCollect, "Assets/Sound/Menu ping 1.wav");
+	audio.LoadSoundEffect(SoundEffect::HitLight, "Assets/Sound/Damage.wav");
+	audio.LoadSoundEffect(SoundEffect::HitHeavy, "Assets/Sound/Damage_2.wav");
+	audio.LoadSoundEffect(SoundEffect::Death, "Assets/Sound/Explosion2.wav");
+	audio.LoadMusic("Assets/Sound/Menu_Ambience.wav");
+	audio.PlayMusic(true);
+	audio.SetMusicVolume(50.f);
+}
 
 bool Client::StaticInit()
 {
@@ -10,10 +26,10 @@ bool Client::StaticInit()
 	FontManager::StaticInit();
 	TextureManager::StaticInit();
 	RenderManager::StaticInit();
-	
 
 	HUD::StaticInit();
 	MenuManager::StaticInit();
+	InitAudio();
 
 	s_instance.reset(client);
 
@@ -47,18 +63,18 @@ void Client::InitializeMenuButtons()
 	// Play button - top left
 	MenuManager::sInstance->AddButton(sf::FloatRect(220, 320, 200, 90), "button_play", [this]() {
 		StartGame();
-	});
+		});
 
 	// Info button - top right
 	MenuManager::sInstance->AddButton(sf::FloatRect(860, 320, 200, 90), "button_info", [this]() {
 		MenuManager::sInstance->SetMenuState(MENU_INSTRUCTIONS);
-	});
+		});
 
 	// Instructions Menu - Back Button (Play button) on right side
 	MenuManager::sInstance->SetMenuState(MENU_INSTRUCTIONS);
 	MenuManager::sInstance->AddButton(sf::FloatRect(1160, 660, 100, 50), "button_play", [this]() {
 		MenuManager::sInstance->SetMenuState(MENU_MAIN);
-	});
+		});
 
 	// Set back to main menu state
 	MenuManager::sInstance->SetMenuState(MENU_MAIN);
