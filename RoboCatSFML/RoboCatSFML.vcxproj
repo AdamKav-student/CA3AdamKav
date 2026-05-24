@@ -153,7 +153,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AckRange.hpp" />
-    <ClInclude Include="AudioManager.hpp" />
     <ClInclude Include="ByteSwap.hpp" />
     <ClInclude Include="DeliveryNotificationManager.hpp" />
     <ClInclude Include="Engine.hpp" />
@@ -188,7 +187,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AckRange.cpp" />
-    <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="DeliveryNotificationManager.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GameObject.cpp" />

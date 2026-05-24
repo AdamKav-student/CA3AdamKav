@@ -1,17 +1,17 @@
 #include "RoboCatClientPCH.hpp"
-#include "AudioManager.hpp"          
+       
 
 static void InitAudio()
 {
 	auto& audio = AudioManager::Instance();
-	audio.LoadSoundEffect(SoundEffect::ButtonClick, "Assets/Sound/Confirmation.wav");
-	audio.LoadSoundEffect(SoundEffect::PlayerMove, "Assets/Sound/Player_Start.wav");
-	audio.LoadSoundEffect(SoundEffect::WeaponFire, "Assets/Sound/Player_Fire.wav");
-	audio.LoadSoundEffect(SoundEffect::ItemCollect, "Assets/Sound/Menu ping 1.wav");
-	audio.LoadSoundEffect(SoundEffect::HitLight, "Assets/Sound/Damage.wav");
-	audio.LoadSoundEffect(SoundEffect::HitHeavy, "Assets/Sound/Damage_2.wav");
-	audio.LoadSoundEffect(SoundEffect::Death, "Assets/Sound/Explosion2.wav");
-	audio.LoadMusic("Assets/Sound/Menu_Ambience.wav");
+	audio.LoadSoundEffect(SoundEffect::ButtonClick, "Assets/Confirmation.wav");
+	audio.LoadSoundEffect(SoundEffect::PlayerMove, "Assets/Player_Start.wav");
+	audio.LoadSoundEffect(SoundEffect::WeaponFire, "Assets/Player_Fire.wav");
+	audio.LoadSoundEffect(SoundEffect::ItemCollect, "Assets/Menu ping 1.wav");
+	audio.LoadSoundEffect(SoundEffect::HitLight, "Assets/Damage.wav");
+	audio.LoadSoundEffect(SoundEffect::HitHeavy, "Assets/Damage_2.wav");
+	audio.LoadSoundEffect(SoundEffect::Death, "Assets/Explosion2.wav");
+	audio.LoadMusic("Assets/Menu_Ambience.wav");
 	audio.PlayMusic(true);
 	audio.SetMusicVolume(50.f);
 }

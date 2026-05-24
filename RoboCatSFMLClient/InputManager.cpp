@@ -1,5 +1,5 @@
 #include "RoboCatClientPCH.hpp"
-#include "AudioManager.hpp"
+
 unique_ptr< InputManager >	InputManager::sInstance;
 
 namespace
@@ -72,6 +72,20 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 		else if (inInputAction == EIA_Released)
 			CheckAndStopTankTracks();
 		break;
+
+	case sf::Keyboard::Left:
+		if (inInputAction == EIA_Pressed)
+			mCurrentState.mDesiredTurretAmount = -1.f;
+		else if (inInputAction == EIA_Released)
+			mCurrentState.mDesiredTurretAmount = 0.f;
+		break;
+	case sf::Keyboard::Right:
+		if (inInputAction == EIA_Pressed)
+			mCurrentState.mDesiredTurretAmount = 1.f;
+		else if (inInputAction == EIA_Released)
+			mCurrentState.mDesiredTurretAmount = 0.f;
+		break;
+
 	case sf::Keyboard::K:
 		UpdateDesireVariableFromKey(inInputAction, mCurrentState.mIsShooting);
 		if (inInputAction == EIA_Pressed)

@@ -1,7 +1,7 @@
 #include "RoboCatPCH.hpp"
 
-const float WORLD_HEIGHT = 1420.f;
-const float WORLD_WIDTH = 2280.f;
+const float WORLD_HEIGHT = 1500.f;
+const float WORLD_WIDTH = 2500.f;
 
 RoboCat::RoboCat() :
 	GameObject(),
