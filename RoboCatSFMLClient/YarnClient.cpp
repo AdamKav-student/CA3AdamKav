@@ -1,5 +1,5 @@
 #include "RoboCatClientPCH.hpp"
-#include "AudioManager.hpp"
+
 
 YarnClient::YarnClient()
 {
@@ -54,7 +54,6 @@ void YarnClient::Read(InputMemoryBitStream& inInputStream)
 	if (stateBit)
 	{
 		inInputStream.Read(mPlayerId, 8);
-		AudioManager::Instance().PlaySoundEffect(SoundEffect::ItemCollect);
 	}
 
 	// debug: ensure sprite position updated

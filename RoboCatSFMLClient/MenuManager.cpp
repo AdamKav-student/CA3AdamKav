@@ -1,5 +1,4 @@
 #include "RoboCatClientPCH.hpp"
-#include "AudioManager.hpp"
 
 std::unique_ptr<MenuManager> MenuManager::sInstance;
 
@@ -141,7 +140,6 @@ void MenuManager::HandleMouseClick(const sf::Vector2f& mousePos)
 		{
 			if (button.bounds.contains(mousePos))
 			{
-				AudioManager::Instance().PlaySoundEffect(SoundEffect::ButtonClick); // ADD THIS
 				button.onClick();
 			}
 		}

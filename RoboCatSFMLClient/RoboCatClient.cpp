@@ -17,16 +17,18 @@ RoboCatClient::RoboCatClient() :
 	mTurretComponent->SetDrawOrder(6);
 
 }
+
 void RoboCatClient::HandleDying()
 {
 	RoboCat::HandleDying();
 
+	//and if we're local, tell the hud so our health goes away!
 	if (GetPlayerId() == NetworkManagerClient::sInstance->GetPlayerId())
 	{
 		HUD::sInstance->SetPlayerHealth(0);
-		AudioManager::Instance().PlaySoundEffect(SoundEffect::Death); // ADD
 	}
 }
+
 
 void RoboCatClient::Update()
 {
@@ -139,18 +141,10 @@ void RoboCatClient::Read(InputMemoryBitStream& inInputStream)
 
 	if (GetPlayerId() == NetworkManagerClient::sInstance->GetPlayerId())
 	{
+		//did we get health? if so, tell the hud!
 		if ((readState & ECRS_Health) != 0)
 		{
 			HUD::sInstance->SetPlayerHealth(mHealth);
-
-			// Two damage sounds: heavy hit at low health, light hit otherwise
-			if (mHealth > 0)
-			{
-				if (mHealth <= 3)
-					AudioManager::Instance().PlaySoundEffect(SoundEffect::HitHeavy);
-				else
-					AudioManager::Instance().PlaySoundEffect(SoundEffect::HitLight);
-			}
 		}
 
 		DoClientSidePredictionAfterReplicationForLocalCat(readState);
@@ -196,7 +190,7 @@ void RoboCatClient::DoClientSidePredictionAfterReplicationForLocalCat(uint32_t i
 }
 
 
-void RoboCatClient::InterpolateClientSidePrediction(float inOldRotation, const Vector3& inOldLocation, const Vector3& inOldVelocity, bool inIsForRemoteCat)
+void RoboCatClient::InterpolateClientSidePrediction(float inOldRotation, const Vector3 & inOldLocation, const Vector3 & inOldVelocity, bool inIsForRemoteCat)
 {
 	if (inOldRotation != GetRotation() && !inIsForRemoteCat)
 	{

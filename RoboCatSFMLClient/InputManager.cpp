@@ -1,5 +1,5 @@
 #include "RoboCatClientPCH.hpp"
-#include "AudioManager.hpp"
+
 unique_ptr< InputManager >	InputManager::sInstance;
 
 namespace
@@ -46,36 +46,30 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 	{
 	case sf::Keyboard::A:
 		UpdateDesireFloatFromKey(inInputAction, mCurrentState.mDesiredLeftAmount);
-		if (inInputAction == EIA_Pressed)
-			AudioManager::Instance().PlaySoundEffectLooped(SoundEffect::PlayerMove);
-		else if (inInputAction == EIA_Released)
-			CheckAndStopTankTracks();
 		break;
 	case sf::Keyboard::D:
 		UpdateDesireFloatFromKey(inInputAction, mCurrentState.mDesiredRightAmount);
-		if (inInputAction == EIA_Pressed)
-			AudioManager::Instance().PlaySoundEffectLooped(SoundEffect::PlayerMove);
-		else if (inInputAction == EIA_Released)
-			CheckAndStopTankTracks();
 		break;
 	case sf::Keyboard::W:
 		UpdateDesireFloatFromKey(inInputAction, mCurrentState.mDesiredForwardAmount);
-		if (inInputAction == EIA_Pressed)
-			AudioManager::Instance().PlaySoundEffectLooped(SoundEffect::PlayerMove);
-		else if (inInputAction == EIA_Released)
-			CheckAndStopTankTracks();
 		break;
 	case sf::Keyboard::S:
 		UpdateDesireFloatFromKey(inInputAction, mCurrentState.mDesiredBackAmount);
+		break;
+	case sf::Keyboard::Left:
 		if (inInputAction == EIA_Pressed)
-			AudioManager::Instance().PlaySoundEffectLooped(SoundEffect::PlayerMove);
+			mCurrentState.mDesiredTurretAmount = -1.f;
 		else if (inInputAction == EIA_Released)
-			CheckAndStopTankTracks();
+			mCurrentState.mDesiredTurretAmount = 0.f;
+		break;
+	case sf::Keyboard::Right:
+		if (inInputAction == EIA_Pressed)
+			mCurrentState.mDesiredTurretAmount = 1.f;
+		else if (inInputAction == EIA_Released)
+			mCurrentState.mDesiredTurretAmount = 0.f;
 		break;
 	case sf::Keyboard::K:
 		UpdateDesireVariableFromKey(inInputAction, mCurrentState.mIsShooting);
-		if (inInputAction == EIA_Pressed)
-			AudioManager::Instance().PlaySoundEffect(SoundEffect::WeaponFire);
 		break;
 	case sf::Keyboard::Add:
 	case sf::Keyboard::Equal:
@@ -135,17 +129,5 @@ void InputManager::Update()
 	if (IsTimeToSampleInput())
 	{
 		mPendingMove = &SampleInputAsMove();
-	}
-}
-
-void InputManager::CheckAndStopTankTracks()
-{
-	// Only stop if no movement keys are still held
-	if (mCurrentState.mDesiredLeftAmount == 0.f &&
-		mCurrentState.mDesiredRightAmount == 0.f &&
-		mCurrentState.mDesiredForwardAmount == 0.f &&
-		mCurrentState.mDesiredBackAmount == 0.f)
-	{
-		AudioManager::Instance().StopSoundEffect(SoundEffect::PlayerMove);
 	}
 }

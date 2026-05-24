@@ -16,8 +16,6 @@ public:
 
 private:
 
-	void CheckAndStopTankTracks();
-
 	InputState							mCurrentState;
 
 	InputManager();
