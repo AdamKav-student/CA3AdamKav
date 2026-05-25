@@ -82,6 +82,19 @@ void Client::InitializeMenuButtons()
 		MenuManager::sInstance->SetMenuState(MENU_MAIN);
 		});
 
+	// Team Select — Sherman button
+	MenuManager::sInstance->SetMenuState(MENU_TEAM_SELECT);
+	MenuManager::sInstance->AddButton(sf::FloatRect(300.f, 540.f, 220.f, 70.f), "button_play", [this]() {
+		RoboCatClient::sLocalTankType = TANK_SHERMAN;
+		StartGame();
+		});
+
+	// Team Select — Panzer button
+	MenuManager::sInstance->AddButton(sf::FloatRect(740.f, 540.f, 220.f, 70.f), "button_play", [this]() {
+		RoboCatClient::sLocalTankType = TANK_PANZER;
+		StartGame();
+		});
+
 	// Set back to main menu state
 	MenuManager::sInstance->SetMenuState(MENU_MAIN);
 }

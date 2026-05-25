@@ -1,10 +1,14 @@
 #include "RoboCatClientPCH.hpp"
 #include "AudioManager.hpp"
+#include "TankType.hpp"
 
 std::unique_ptr<MenuManager> MenuManager::sInstance;
 
+void MenuManager::SelectTank(TankType inTank) { mSelectedTank = inTank; }
+
 MenuManager::MenuManager()
-	: mCurrentState(MENU_MAIN)
+	: mCurrentState(MENU_MAIN),
+	mSelectedTank(TANK_SHERMAN)
 {
 	// Initialize background sprite
 	TexturePtr backgroundTexture = TextureManager::sInstance->GetTexture("menu_background");
@@ -14,14 +18,14 @@ MenuManager::MenuManager()
 		// Scale to fit screen
 		float textureWidth = mBackgroundSprite.getLocalBounds().width;
 		float textureHeight = mBackgroundSprite.getLocalBounds().height;
-		
+
 		if (textureWidth > 0 && textureHeight > 0)
 		{
 			float scaleX = 1280.0f / textureWidth;
 			float scaleY = 720.0f / textureHeight;
 			float scale = (scaleX < scaleY) ? scaleX : scaleY;
 			mBackgroundSprite.setScale(scale, scale);
-			
+
 			// Center the sprite
 			float scaledWidth = textureWidth * scale;
 			float scaledHeight = textureHeight * scale;
@@ -37,14 +41,14 @@ MenuManager::MenuManager()
 		// Scale to fit screen
 		float textureWidth = mInstructionsBackgroundSprite.getLocalBounds().width;
 		float textureHeight = mInstructionsBackgroundSprite.getLocalBounds().height;
-		
+
 		if (textureWidth > 0 && textureHeight > 0)
 		{
 			float scaleX = 1280.0f / textureWidth;
 			float scaleY = 720.0f / textureHeight;
 			float scale = (scaleX < scaleY) ? scaleX : scaleY;
 			mInstructionsBackgroundSprite.setScale(scale, scale);
-			
+
 			// Center the sprite
 			float scaledWidth = textureWidth * scale;
 			float scaledHeight = textureHeight * scale;
@@ -60,20 +64,40 @@ MenuManager::MenuManager()
 		// Scale to fit screen - scale up if needed
 		float textureWidth = mInstructionsSprite.getLocalBounds().width;
 		float textureHeight = mInstructionsSprite.getLocalBounds().height;
-		
+
 		if (textureWidth > 0 && textureHeight > 0)
 		{
 			float scaleX = 1200.0f / textureWidth;  // Leave 40px margin
 			float scaleY = 650.0f / textureHeight;  // Leave space for button
 			float scale = (scaleX < scaleY) ? scaleX : scaleY;
 			mInstructionsSprite.setScale(scale, scale);
-			
+
 			// Center the sprite
 			float scaledWidth = textureWidth * scale;
 			float scaledHeight = textureHeight * scale;
 			mInstructionsSprite.setPosition((1280.0f - scaledWidth) / 2.0f, (680.0f - scaledHeight) / 2.0f);
 		}
 	}
+
+	// Sherman preview sprite
+	TexturePtr shermanTex = TextureManager::sInstance->GetTexture("cat");
+	if (shermanTex)
+	{
+		mShermanPreviewSprite.setTexture(*shermanTex);
+		mShermanPreviewSprite.setScale(3.f, 3.f);
+		mShermanPreviewSprite.setPosition(320.f, 260.f);
+	}
+
+	// Panzer preview sprite
+	TexturePtr panzerTex = TextureManager::sInstance->GetTexture("panzer");
+	if (panzerTex)
+	{
+		mPanzerPreviewSprite.setTexture(*panzerTex);
+		mPanzerPreviewSprite.setScale(3.f, 3.f);
+		mPanzerPreviewSprite.setPosition(760.f, 260.f);
+	}
+
+
 }
 
 void MenuManager::StaticInit()
@@ -94,46 +118,43 @@ void MenuManager::AddButton(const sf::FloatRect& bounds, const std::string& text
 		button.sprite.setPosition(bounds.left, bounds.top);
 		// Scale button image to fit button bounds
 		button.sprite.setScale(bounds.width / button.sprite.getLocalBounds().width,
-		                        bounds.height / button.sprite.getLocalBounds().height);
+			bounds.height / button.sprite.getLocalBounds().height);
 	}
 
 	// Add to appropriate menu based on current state
 	if (mCurrentState == MENU_MAIN)
-	{
 		mMainMenuButtons.push_back(button);
-	}
 	else if (mCurrentState == MENU_INSTRUCTIONS)
-	{
 		mInstructionsMenuButtons.push_back(button);
-	}
+	else if (mCurrentState == MENU_TEAM_SELECT)    // ADD
+		mTeamSelectButtons.push_back(button);       // ADD
 }
+
 
 void MenuManager::HandleMouseMove(const sf::Vector2f& mousePos)
 {
 	std::vector<Button>* buttons = nullptr;
-
 	if (mCurrentState == MENU_MAIN)
 		buttons = &mMainMenuButtons;
 	else if (mCurrentState == MENU_INSTRUCTIONS)
 		buttons = &mInstructionsMenuButtons;
+	else if (mCurrentState == MENU_TEAM_SELECT)
+		buttons = &mTeamSelectButtons;
 
 	if (buttons)
-	{
 		for (auto& button : *buttons)
-		{
 			button.hovered = button.bounds.contains(mousePos);
-		}
-	}
 }
 
 void MenuManager::HandleMouseClick(const sf::Vector2f& mousePos)
 {
 	std::vector<Button>* buttons = nullptr;
-
 	if (mCurrentState == MENU_MAIN)
 		buttons = &mMainMenuButtons;
 	else if (mCurrentState == MENU_INSTRUCTIONS)
 		buttons = &mInstructionsMenuButtons;
+	else if (mCurrentState == MENU_TEAM_SELECT)
+		buttons = &mTeamSelectButtons;
 
 	if (buttons)
 	{
@@ -141,7 +162,7 @@ void MenuManager::HandleMouseClick(const sf::Vector2f& mousePos)
 		{
 			if (button.bounds.contains(mousePos))
 			{
-				AudioManager::Instance().PlaySoundEffect(SoundEffect::ButtonClick); // ADD THIS
+				AudioManager::Instance().PlaySoundEffect(SoundEffect::ButtonClick);
 				button.onClick();
 			}
 		}
@@ -193,20 +214,85 @@ void MenuManager::RenderInstructions()
 	}
 }
 
+void MenuManager::RenderTeamSelect()
+{
+	WindowManager::sInstance->draw(mBackgroundSprite);
+
+	// Title text
+	sf::Text title;
+	title.setFont(*FontManager::sInstance->GetFont("BOMBARD_"));
+	title.setString("SELECT YOUR TANK");
+	title.setCharacterSize(60);
+	title.setFillColor(sf::Color::White);
+	title.setPosition(380.f, 80.f);
+	WindowManager::sInstance->draw(title);
+
+	// Draw tank previews
+	WindowManager::sInstance->draw(mShermanPreviewSprite);
+	WindowManager::sInstance->draw(mPanzerPreviewSprite);
+
+	// Tank name labels
+	sf::Text shermanLabel, panzerLabel;
+	shermanLabel.setFont(*FontManager::sInstance->GetFont("BOMBARD_"));
+	shermanLabel.setString("Sherman");
+	shermanLabel.setCharacterSize(40);
+	shermanLabel.setFillColor(sf::Color::White);
+	shermanLabel.setPosition(340.f, 480.f);
+	WindowManager::sInstance->draw(shermanLabel);
+
+	panzerLabel.setFont(*FontManager::sInstance->GetFont("BOMBARD_"));
+	panzerLabel.setString("Panzer IV");
+	panzerLabel.setCharacterSize(40);
+	panzerLabel.setFillColor(sf::Color::White);
+	panzerLabel.setPosition(760.f, 480.f);
+	WindowManager::sInstance->draw(panzerLabel);
+
+	// Multiplayer icon sprite
+	TexturePtr multiTex = TextureManager::sInstance->GetTexture("multiplayer");
+	if (multiTex)
+	{
+		mMultiplayerIconSprite.setTexture(*multiTex);
+		mMultiplayerIconSprite.setScale(2.f, 2.f);
+		mMultiplayerIconSprite.setPosition(580.f, 80.f);
+	}
+
+	// Highlight selected tank with a box
+	sf::RectangleShape highlight(sf::Vector2f(220.f, 220.f));
+	highlight.setFillColor(sf::Color(255, 255, 255, 0));
+	highlight.setOutlineColor(sf::Color::Yellow);
+	highlight.setOutlineThickness(4.f);
+	if (mSelectedTank == TANK_SHERMAN)
+		highlight.setPosition(300.f, 240.f);
+	else
+		highlight.setPosition(740.f, 240.f);
+	WindowManager::sInstance->draw(highlight);
+
+	WindowManager::sInstance->draw(mMultiplayerIconSprite);
+
+	// Draw buttons
+	for (auto& button : mTeamSelectButtons)
+	{
+		WindowManager::sInstance->draw(button.sprite);
+		if (button.hovered)
+		{
+			sf::RectangleShape hoverOverlay(sf::Vector2f(button.bounds.width, button.bounds.height));
+			hoverOverlay.setPosition(button.bounds.left, button.bounds.top);
+			hoverOverlay.setFillColor(sf::Color(255, 255, 255, 80));
+			WindowManager::sInstance->draw(hoverOverlay);
+		}
+	}
+}
+
 void MenuManager::Render()
 {
-	// Clear the back buffer
 	WindowManager::sInstance->clear(sf::Color(50, 50, 50, 255));
 
 	if (mCurrentState == MENU_MAIN)
-	{
 		RenderMainMenu();
-	}
 	else if (mCurrentState == MENU_INSTRUCTIONS)
-	{
 		RenderInstructions();
-	}
+	else if (mCurrentState == MENU_TEAM_SELECT)    // ADD
+		RenderTeamSelect();                         // ADD
 
-	// Present back buffer
 	WindowManager::sInstance->display();
 }

@@ -1,22 +1,34 @@
 #include "RoboCatClientPCH.hpp"
+#include "MenuManager.hpp"
+
+TankType RoboCatClient::sLocalTankType = TANK_SHERMAN;
 
 RoboCatClient::RoboCatClient() :
 	mTimeLocationBecameOutOfSync(0.f),
 	mTimeVelocityBecameOutOfSync(0.f),
 	mTurretComponent(nullptr)
 {
+	// Safe null check for unique_ptr
+	TankType selectedTank = TANK_SHERMAN;
+	if (MenuManager::sInstance.get() != nullptr)
+		selectedTank = MenuManager::sInstance->GetSelectedTank();
+
+	string bodyTex = (sLocalTankType == TANK_PANZER) ? "panzer" : "cat";
+	string turretTex = (sLocalTankType == TANK_PANZER) ? "panzer_turret" : "cat_turret";
+
+
 	mSpriteComponent.reset(new PlayerSpriteComponent(this));
-	mSpriteComponent->SetTexture(TextureManager::sInstance->GetTexture("cat"));
+	mSpriteComponent->SetTexture(TextureManager::sInstance->GetTexture(bodyTex));
 	mSpriteComponent->SetDrawOrder(5);
 
 	// Add turret component
 	mTurretComponent = new TurretSpriteComponent(this);
-	mTurretComponent->SetTexture(TextureManager::sInstance->GetTexture("cat_turret"));
-	mTurretComponent->SetOffset(Vector3(0.f, -10.f, 0.f)); // adjust as needed
-	mTurretComponent->SetOriginYOffset(20.f); // lower pivot by 20 pixels
+	mTurretComponent->SetTexture(TextureManager::sInstance->GetTexture(turretTex));
+	mTurretComponent->SetOffset(Vector3(0.f, -10.f, 0.f));
+	mTurretComponent->SetOriginYOffset(20.f);
 	mTurretComponent->SetDrawOrder(6);
-
 }
+
 void RoboCatClient::HandleDying()
 {
 	RoboCat::HandleDying();

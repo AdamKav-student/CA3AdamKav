@@ -22,3 +22,4 @@
 #include "Client.hpp"
 
 #include "AudioManager.hpp" 
+#include "TankType.hpp"

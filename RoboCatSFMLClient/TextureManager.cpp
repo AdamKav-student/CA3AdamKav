@@ -33,6 +33,7 @@ TextureManager::TextureManager()
 	//Menu button images
 	CacheTexture("button_play", "../Assets/Play.png");
 	CacheTexture("button_info", "../Assets/Question.png");
+	CacheTexture("multiplayer", "../Assets/Multiplayer.png");
 
 	//Instructions/Rules/Controls image
 	CacheTexture("instructions_image", "../Assets/Control text.png");
