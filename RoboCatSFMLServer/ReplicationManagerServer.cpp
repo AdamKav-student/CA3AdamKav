@@ -7,8 +7,13 @@ void ReplicationManagerServer::ReplicateCreate(int inNetworkId, uint32_t inIniti
 
 void ReplicationManagerServer::ReplicateDestroy(int inNetworkId)
 {
-	//it's broken if we don't find it...
-	mNetworkIdToReplicationCommand[inNetworkId].SetDestroy();
+	//if we never told this client about the object there's nothing for it to destroy, and using
+	//operator[] here would resurrect an entry we already finished with
+	auto it = mNetworkIdToReplicationCommand.find(inNetworkId);
+	if (it != mNetworkIdToReplicationCommand.end())
+	{
+		it->second.SetDestroy();
+	}
 }
 
 void ReplicationManagerServer::RemoveFromReplication(int inNetworkId)
@@ -18,12 +23,23 @@ void ReplicationManagerServer::RemoveFromReplication(int inNetworkId)
 
 void ReplicationManagerServer::SetStateDirty(int inNetworkId, uint32_t inDirtyState)
 {
-	mNetworkIdToReplicationCommand[inNetworkId].AddDirtyState(inDirtyState);
+	//only objects we're already replicating can go dirty- anything else would create a command
+	//for an object this client has never heard of
+	auto it = mNetworkIdToReplicationCommand.find(inNetworkId);
+	if (it != mNetworkIdToReplicationCommand.end())
+	{
+		it->second.AddDirtyState(inDirtyState);
+	}
 }
 
 void ReplicationManagerServer::HandleCreateAckd(int inNetworkId)
 {
-	mNetworkIdToReplicationCommand[inNetworkId].HandleCreateAckd();
+	//the create might have been ack'd after we already finished replicating the object away
+	auto it = mNetworkIdToReplicationCommand.find(inNetworkId);
+	if (it != mNetworkIdToReplicationCommand.end())
+	{
+		it->second.HandleCreateAckd();
+	}
 }
 
 void ReplicationManagerServer::Write(OutputMemoryBitStream& inOutputStream, ReplicationManagerTransmissionData* ioTransmissionData)
@@ -36,11 +52,20 @@ void ReplicationManagerServer::Write(OutputMemoryBitStream& inOutputStream, Repl
 		{
 			int networkId = pair.first;
 
+			ReplicationAction action = replicationCommand.GetAction();
+
+			//a create or an update has to ask the object to write its state, so the object has to still
+			//be registered. it can die between two writes ( a yarn that hits a cat does exactly that ),
+			//and then there's nothing to say about it until the destroy goes out
+			if (action != RA_Destroy && !NetworkManagerServer::sInstance->GetGameObject(networkId))
+			{
+				continue;
+			}
+
 			//well, first write the network id...
 			inOutputStream.Write(networkId);
 
 			//only need 2 bits for action...
-			ReplicationAction action = replicationCommand.GetAction();
 			inOutputStream.Write(action, 2);
 
 			uint32_t writtenState = 0;
@@ -76,7 +101,7 @@ void ReplicationManagerServer::Write(OutputMemoryBitStream& inOutputStream, Repl
 
 uint32_t ReplicationManagerServer::WriteCreateAction(OutputMemoryBitStream& inOutputStream, int inNetworkId, uint32_t inDirtyState)
 {
-	//need object
+	//need object- Write() only gets us here while the object is still registered
 	GameObjectPtr gameObject = NetworkManagerServer::sInstance->GetGameObject(inNetworkId);
 	//need 4 cc
 	inOutputStream.Write(gameObject->GetClassId());
@@ -85,7 +110,7 @@ uint32_t ReplicationManagerServer::WriteCreateAction(OutputMemoryBitStream& inOu
 
 uint32_t ReplicationManagerServer::WriteUpdateAction(OutputMemoryBitStream& inOutputStream, int inNetworkId, uint32_t inDirtyState)
 {
-	//need object
+	//need object- Write() only gets us here while the object is still registered
 	GameObjectPtr gameObject = NetworkManagerServer::sInstance->GetGameObject(inNetworkId);
 
 	//if we can't find the gameObject on the other side, we won't be able to read the written data ( since we won't know which class wrote it )

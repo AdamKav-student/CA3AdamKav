@@ -21,6 +21,14 @@ DeliveryNotificationManager::DeliveryNotificationManager(bool inShouldSendAcks, 
 //we're going away- log how well we did...
 DeliveryNotificationManager::~DeliveryNotificationManager()
 {
+	//a client that connects and never sends a move never gets a state packet back, so its proxy
+	//is destroyed having dispatched nothing- dividing by that count took the whole server down
+	if (mDispatchedPacketCount == 0)
+	{
+		LOG("DNM destructor. No packets were dispatched.", 0);
+		return;
+	}
+
 	LOG("DNM destructor. Delivery rate %d%%, Drop rate %d%%",
 		(100 * mDeliveredPacketCount) / mDispatchedPacketCount,
 		(100 * mDroppedPacketCount) / mDispatchedPacketCount);

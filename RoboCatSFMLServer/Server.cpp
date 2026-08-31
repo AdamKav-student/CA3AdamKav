@@ -105,8 +105,17 @@ void Server::HandleNewClient(ClientProxyPtr inClientProxy)
 
 void Server::SpawnCatForPlayer(int inPlayerId)
 {
+	//respawns are delayed, so the player who got killed can have disconnected before we get here-
+	//without their scoreboard entry there's nothing to spawn for
+	ScoreBoardManager::Entry* entry = ScoreBoardManager::sInstance->GetEntry(inPlayerId);
+	if (!entry)
+	{
+		LOG("Not spawning a cat for player %d- they have no scoreboard entry", inPlayerId);
+		return;
+	}
+
 	RoboCatPtr cat = std::static_pointer_cast<RoboCat>(GameObjectRegistry::sInstance->CreateGameObject('RCAT'));
-	cat->SetColor(ScoreBoardManager::sInstance->GetEntry(inPlayerId)->GetColor());
+	cat->SetColor(entry->GetColor());
 	cat->SetPlayerId(inPlayerId);
 	//gotta pick a better spawn location than this...
 	cat->SetLocation(Vector3(600.f - static_cast<float>(inPlayerId), 400.f, 0.f));

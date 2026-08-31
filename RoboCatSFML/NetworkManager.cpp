@@ -14,6 +14,14 @@ NetworkManager::~NetworkManager()
 bool NetworkManager::Init(uint16_t inPort)
 {
 	m_socket = SocketUtil::CreateUDPSocket(INET);
+
+	//this check used to sit below the Bind, which meant a socket we failed to create was
+	//dereferenced before we ever looked at it
+	if (m_socket == nullptr)
+	{
+		return false;
+	}
+
 	SocketAddress ownAddress(INADDR_ANY, inPort);
 	m_socket->Bind(ownAddress);
 
@@ -21,12 +29,6 @@ bool NetworkManager::Init(uint16_t inPort)
 
 	m_bytes_received_per_second = WeightedTimedMovingAverage(1.f);
 	m_bytes_sent_per_second = WeightedTimedMovingAverage(1.f);
-
-	//did we bind okay?
-	if (m_socket == nullptr)
-	{
-		return false;
-	}
 
 	if (m_socket->SetNonBlockingMode(true) != NO_ERROR)
 	{

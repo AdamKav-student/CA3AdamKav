@@ -11,8 +11,9 @@ sf::Sprite& PlayerSpriteComponent::GetSprite()
 	auto rot = mGameObject->GetRotation();
 	m_sprite.setPosition(pos.mX, pos.mY);
 	m_sprite.setRotation(rot);
-	RoboCat* player = dynamic_cast<RoboCat*>(mGameObject);
-	Vector3 playerColor = player->GetColor();
+	//GetAsCat() already tells us this cheaply, and an unchecked dynamic_cast would take the whole
+	//client down the first time this component ends up on something that isn't a player
+	Vector3 playerColor = mGameObject->GetAsCat() ? mGameObject->GetColor() : Colors::White;
 	m_sprite.setColor(sf::Color(playerColor.mX, playerColor.mY, playerColor.mZ, 255));
 
 	return m_sprite;

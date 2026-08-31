@@ -19,8 +19,16 @@ void GameObjectRegistry::RegisterCreationFunction(uint32_t inFourCCName, GameObj
 
 GameObjectPtr GameObjectRegistry::CreateGameObject(uint32_t inFourCCName)
 {
-	//no error checking- if the name isn't there, exception!
-	GameObjectCreationFunc creationFunc = mNameToGameObjectCreationFunctionMap[inFourCCName];
+	//an unregistered name used to default construct a null creation function and then call it,
+	//which crashed instead of telling the caller anything useful
+	auto it = mNameToGameObjectCreationFunctionMap.find(inFourCCName);
+	if (it == mNameToGameObjectCreationFunctionMap.end())
+	{
+		LOG("No creation function registered for object type %d", inFourCCName);
+		return nullptr;
+	}
+
+	GameObjectCreationFunc creationFunc = it->second;
 
 	GameObjectPtr gameObject = creationFunc();
 

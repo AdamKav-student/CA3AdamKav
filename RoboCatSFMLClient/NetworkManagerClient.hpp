@@ -32,7 +32,7 @@ private:
 	void	ReadLastMoveProcessedOnServerTimestamp(InputMemoryBitStream& inInputStream);
 
 	void	HandleGameObjectState(InputMemoryBitStream& inInputStream);
-	void	HandleScoreBoardState(InputMemoryBitStream& inInputStream);
+	bool	HandleScoreBoardState(InputMemoryBitStream& inInputStream);
 
 	void	UpdateSendingInputPacket();
 	void	SendInputPacket();

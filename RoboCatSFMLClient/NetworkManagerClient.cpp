@@ -9,8 +9,14 @@ namespace
 }
 
 NetworkManagerClient::NetworkManagerClient() :
-	mState(NCS_Uninitialized),
+	//in declaration order. UpdateSendingInputPacket compares against mTimeOfLastInputPacket before
+	//anything sets it- left as stack garbage it can hold off every input packet indefinitely, and
+	//the server then times us out for having gone quiet
 	mDeliveryNotificationManager(true, false),
+	mState(NCS_Uninitialized),
+	mTimeOfLastInputPacket(0.f),
+	mPlayerId(0),
+	mLastMoveProcessedByServerTimestamp(0.f),
 	mLastRoundTripTime(0.f)
 {
 }
@@ -109,7 +115,12 @@ void NetworkManagerClient::HandleStatePacket(InputMemoryBitStream& inInputStream
 
 		//old
 		//HandleGameObjectState( inPacketBuffer );
-		HandleScoreBoardState(inInputStream);
+		//if the scoreboard didn't read cleanly we're no longer aligned with what the server wrote,
+		//so there's nothing sensible left to hand the replication manager
+		if (!HandleScoreBoardState(inInputStream))
+		{
+			return;
+		}
 
 		//tell the replication manager to handle the rest...
 		mReplicationManagerClient.Read(inInputStream);
@@ -174,9 +185,9 @@ void NetworkManagerClient::HandleGameObjectState(InputMemoryBitStream& inInputSt
 	DestroyGameObjectsInMap(objectsToDestroy);
 }
 
-void NetworkManagerClient::HandleScoreBoardState(InputMemoryBitStream& inInputStream)
+bool NetworkManagerClient::HandleScoreBoardState(InputMemoryBitStream& inInputStream)
 {
-	ScoreBoardManager::sInstance->Read(inInputStream);
+	return ScoreBoardManager::sInstance->Read(inInputStream);
 }
 
 void NetworkManagerClient::DestroyGameObjectsInMap(const IntToGameObjectMap& inObjectsToDestroy)
@@ -218,7 +229,7 @@ void NetworkManagerClient::SendInputPacket()
 		//we only want to send the last three moves
 		int moveCount = moveList.GetMoveCount();
 		int firstMoveIndex = moveCount - 3;
-		if (firstMoveIndex < 3)
+		if (firstMoveIndex < 0)
 		{
 			firstMoveIndex = 0;
 		}

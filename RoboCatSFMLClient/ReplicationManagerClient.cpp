@@ -1,5 +1,4 @@
 #include "RoboCatClientPCH.hpp"
-#include <cassert>
 
 void ReplicationManagerClient::Read(InputMemoryBitStream& inInputStream)
 {
@@ -11,24 +10,34 @@ void ReplicationManagerClient::Read(InputMemoryBitStream& inInputStream)
 		//only need 2 bits for action...
 		uint8_t action; inInputStream.Read(action, 2);
 
+		bool canKeepReading = false;
+
 		switch (action)
 		{
 		case RA_Create:
-			ReadAndDoCreateAction(inInputStream, networkId);
+			canKeepReading = ReadAndDoCreateAction(inInputStream, networkId);
 			break;
 		case RA_Update:
-			ReadAndDoUpdateAction(inInputStream, networkId);
+			canKeepReading = ReadAndDoUpdateAction(inInputStream, networkId);
 			break;
 		case RA_Destroy:
-			ReadAndDoDestroyAction(inInputStream, networkId);
+			canKeepReading = ReadAndDoDestroyAction(inInputStream, networkId);
+			break;
+		default:
+			//we have no idea how many bits this record used, so the rest of the packet is garbage to us
+			LOG("Replication packet contained unknown action %d- ignoring the rest of it", action);
 			break;
 		}
 
+		if (!canKeepReading)
+		{
+			return;
+		}
 	}
 
 }
 
-void ReplicationManagerClient::ReadAndDoCreateAction(InputMemoryBitStream& inInputStream, int inNetworkId)
+bool ReplicationManagerClient::ReadAndDoCreateAction(InputMemoryBitStream& inInputStream, int inNetworkId)
 {
 	//need 4 cc
 	uint32_t fourCCName;
@@ -41,29 +50,56 @@ void ReplicationManagerClient::ReadAndDoCreateAction(InputMemoryBitStream& inInp
 	{
 		//create the object and map it...
 		gameObject = GameObjectRegistry::sInstance->CreateGameObject(fourCCName);
+
+		//an unknown class id means we're reading from the wrong place in the stream- bail out instead of
+		//calling through a null creation function
+		if (!gameObject)
+		{
+			LOG("Replication packet asked for unknown object type %d- ignoring the rest of it", fourCCName);
+			return false;
+		}
+
 		gameObject->SetNetworkId(inNetworkId);
 		NetworkManagerClient::sInstance->AddNetworkIdToGameObjectMap(gameObject);
-
-		//it had really be the rigth type...
-		assert(gameObject->GetClassId() == fourCCName);
+	}
+	else if (gameObject->GetClassId() != fourCCName)
+	{
+		//it had really better be the right type- if it isn't, we can't read the state that follows
+		LOG("Replication packet re-created object %d as the wrong type- ignoring the rest of it", inNetworkId);
+		return false;
 	}
 
 	//and read state
 	gameObject->Read(inInputStream);
+
+	return true;
 }
 
-void ReplicationManagerClient::ReadAndDoUpdateAction(InputMemoryBitStream& inInputStream, int inNetworkId)
+bool ReplicationManagerClient::ReadAndDoUpdateAction(InputMemoryBitStream& inInputStream, int inNetworkId)
 {
 	//need object
 	GameObjectPtr gameObject = NetworkManagerClient::sInstance->GetGameObject(inNetworkId);
 
-	//gameObject MUST be found, because create was ack'd if we're getting an update...
+	//the server only sends an update once the create was ack'd, so normally we have this object.
+	//we can still miss it though- we destroy locally as soon as the destroy arrives, while an update
+	//for the same object can already be on the wire. we don't know how big that update is, so all we
+	//can safely do is stop reading this packet rather than dereference nothing.
+	if (!gameObject)
+	{
+		LOG("Replication packet updated unknown object %d- ignoring the rest of it", inNetworkId);
+		return false;
+	}
+
 	//and read state
 	gameObject->Read(inInputStream);
+
+	return true;
 }
 
-void ReplicationManagerClient::ReadAndDoDestroyAction(InputMemoryBitStream& inInputStream, int inNetworkId)
+bool ReplicationManagerClient::ReadAndDoDestroyAction(InputMemoryBitStream& inInputStream, int inNetworkId)
 {
+	(void)inInputStream;
+
 	//if something was destroyed before the create went through, we'll never get it
 	//but we might get the destroy request, so be tolerant of being asked to destroy something that wasn't created
 	GameObjectPtr gameObject = NetworkManagerClient::sInstance->GetGameObject(inNetworkId);
@@ -72,4 +108,7 @@ void ReplicationManagerClient::ReadAndDoDestroyAction(InputMemoryBitStream& inIn
 		gameObject->SetDoesWantToDie(true);
 		NetworkManagerClient::sInstance->RemoveNetworkIdToGameObjectMap(gameObject);
 	}
+
+	//a destroy carries no state, so the stream is still aligned either way
+	return true;
 }
