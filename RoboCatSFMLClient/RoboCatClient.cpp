@@ -1,7 +1,4 @@
 #include "RoboCatClientPCH.hpp"
-#include "MenuManager.hpp"
-
-TankType RoboCatClient::sLocalTankType = TANK_SHERMAN;
 
 RoboCatClient::RoboCatClient() :
 	mTimeLocationBecameOutOfSync(0.f),
