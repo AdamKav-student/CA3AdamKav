@@ -14,8 +14,10 @@ struct ReplicationCommand
 {
 public:
 
-	ReplicationCommand() {}
-	ReplicationCommand(uint32_t inInitialDirtyState) : mAction(RA_Create), mDirtyState(inInitialDirtyState) {}
+	//HasDirtyState() reads both of these, so a default constructed command has to be inert
+	//rather than whatever happened to be on the heap
+	ReplicationCommand() : mDirtyState(0), mAction(RA_Update) {}
+	ReplicationCommand(uint32_t inInitialDirtyState) : mDirtyState(inInitialDirtyState), mAction(RA_Create) {}
 
 	//if the create is ack'd, we can demote to just an update...
 	void HandleCreateAckd() { if (mAction == RA_Create) { mAction = RA_Update; } }

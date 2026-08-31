@@ -76,9 +76,19 @@ void RoboCatServer::HandleShooting()
 
 void RoboCatServer::TakeDamage(int inDamagingPlayerId)
 {
-	mHealth--;
-	if (mHealth <= 0.f)
+	//two projectiles can land in the same frame- we're not removed from the world until the end of it,
+	//so without this the second hit scores again, respawns us again and pushes health below zero,
+	//which then gets written wrapped into the 4 bits we reserve for it
+	if (DoesWantToDie())
 	{
+		return;
+	}
+
+	mHealth--;
+	if (mHealth <= 0)
+	{
+		mHealth = 0;
+
 		//score one for damaging player...
 		ScoreBoardManager::sInstance->IncScore(inDamagingPlayerId, 1);
 

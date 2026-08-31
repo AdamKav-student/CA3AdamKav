@@ -1,14 +1,10 @@
 #include "RoboCatClientPCH.hpp"
 #include "AudioManager.hpp"
-#include "TankType.hpp"
 
 std::unique_ptr<MenuManager> MenuManager::sInstance;
 
-void MenuManager::SelectTank(TankType inTank) { mSelectedTank = inTank; }
-
 MenuManager::MenuManager()
-	: mCurrentState(MENU_MAIN),
-	mSelectedTank(TANK_SHERMAN)
+	: mCurrentState(MENU_MAIN)
 {
 	// Initialize background sprite
 	TexturePtr backgroundTexture = TextureManager::sInstance->GetTexture("menu_background");
@@ -79,25 +75,6 @@ MenuManager::MenuManager()
 		}
 	}
 
-	// Sherman preview sprite
-	TexturePtr shermanTex = TextureManager::sInstance->GetTexture("cat");
-	if (shermanTex)
-	{
-		mShermanPreviewSprite.setTexture(*shermanTex);
-		mShermanPreviewSprite.setScale(3.f, 3.f);
-		mShermanPreviewSprite.setPosition(320.f, 260.f);
-	}
-
-	// Panzer preview sprite
-	TexturePtr panzerTex = TextureManager::sInstance->GetTexture("panzer");
-	if (panzerTex)
-	{
-		mPanzerPreviewSprite.setTexture(*panzerTex);
-		mPanzerPreviewSprite.setScale(3.f, 3.f);
-		mPanzerPreviewSprite.setPosition(760.f, 260.f);
-	}
-
-
 }
 
 void MenuManager::StaticInit()
@@ -126,8 +103,6 @@ void MenuManager::AddButton(const sf::FloatRect& bounds, const std::string& text
 		mMainMenuButtons.push_back(button);
 	else if (mCurrentState == MENU_INSTRUCTIONS)
 		mInstructionsMenuButtons.push_back(button);
-	else if (mCurrentState == MENU_TEAM_SELECT)    // ADD
-		mTeamSelectButtons.push_back(button);       // ADD
 }
 
 
@@ -138,8 +113,6 @@ void MenuManager::HandleMouseMove(const sf::Vector2f& mousePos)
 		buttons = &mMainMenuButtons;
 	else if (mCurrentState == MENU_INSTRUCTIONS)
 		buttons = &mInstructionsMenuButtons;
-	else if (mCurrentState == MENU_TEAM_SELECT)
-		buttons = &mTeamSelectButtons;
 
 	if (buttons)
 		for (auto& button : *buttons)
@@ -153,8 +126,6 @@ void MenuManager::HandleMouseClick(const sf::Vector2f& mousePos)
 		buttons = &mMainMenuButtons;
 	else if (mCurrentState == MENU_INSTRUCTIONS)
 		buttons = &mInstructionsMenuButtons;
-	else if (mCurrentState == MENU_TEAM_SELECT)
-		buttons = &mTeamSelectButtons;
 
 	if (buttons)
 	{
@@ -214,75 +185,6 @@ void MenuManager::RenderInstructions()
 	}
 }
 
-void MenuManager::RenderTeamSelect()
-{
-	WindowManager::sInstance->draw(mBackgroundSprite);
-
-	// Title text
-	sf::Text title;
-	title.setFont(*FontManager::sInstance->GetFont("BOMBARD_"));
-	title.setString("SELECT YOUR TANK");
-	title.setCharacterSize(60);
-	title.setFillColor(sf::Color::White);
-	title.setPosition(380.f, 80.f);
-	WindowManager::sInstance->draw(title);
-
-	// Draw tank previews
-	WindowManager::sInstance->draw(mShermanPreviewSprite);
-	WindowManager::sInstance->draw(mPanzerPreviewSprite);
-
-	// Tank name labels
-	sf::Text shermanLabel, panzerLabel;
-	shermanLabel.setFont(*FontManager::sInstance->GetFont("BOMBARD_"));
-	shermanLabel.setString("Sherman");
-	shermanLabel.setCharacterSize(40);
-	shermanLabel.setFillColor(sf::Color::White);
-	shermanLabel.setPosition(340.f, 480.f);
-	WindowManager::sInstance->draw(shermanLabel);
-
-	panzerLabel.setFont(*FontManager::sInstance->GetFont("BOMBARD_"));
-	panzerLabel.setString("Panzer IV");
-	panzerLabel.setCharacterSize(40);
-	panzerLabel.setFillColor(sf::Color::White);
-	panzerLabel.setPosition(760.f, 480.f);
-	WindowManager::sInstance->draw(panzerLabel);
-
-	// Multiplayer icon sprite
-	TexturePtr multiTex = TextureManager::sInstance->GetTexture("multiplayer");
-	if (multiTex)
-	{
-		mMultiplayerIconSprite.setTexture(*multiTex);
-		mMultiplayerIconSprite.setScale(2.f, 2.f);
-		mMultiplayerIconSprite.setPosition(580.f, 80.f);
-	}
-
-	// Highlight selected tank with a box
-	sf::RectangleShape highlight(sf::Vector2f(220.f, 220.f));
-	highlight.setFillColor(sf::Color(255, 255, 255, 0));
-	highlight.setOutlineColor(sf::Color::Yellow);
-	highlight.setOutlineThickness(4.f);
-	if (mSelectedTank == TANK_SHERMAN)
-		highlight.setPosition(300.f, 240.f);
-	else
-		highlight.setPosition(740.f, 240.f);
-	WindowManager::sInstance->draw(highlight);
-
-	WindowManager::sInstance->draw(mMultiplayerIconSprite);
-
-	// Draw buttons
-	for (auto& button : mTeamSelectButtons)
-	{
-		WindowManager::sInstance->draw(button.sprite);
-		if (button.hovered)
-		{
-			sf::RectangleShape hoverOverlay(sf::Vector2f(button.bounds.width, button.bounds.height));
-			hoverOverlay.setPosition(button.bounds.left, button.bounds.top);
-			hoverOverlay.setFillColor(sf::Color(255, 255, 255, 80));
-			WindowManager::sInstance->draw(hoverOverlay);
-		}
-	}
-}
-
 void MenuManager::Render()
 {
 	WindowManager::sInstance->clear(sf::Color(50, 50, 50, 255));
@@ -291,8 +193,6 @@ void MenuManager::Render()
 		RenderMainMenu();
 	else if (mCurrentState == MENU_INSTRUCTIONS)
 		RenderInstructions();
-	else if (mCurrentState == MENU_TEAM_SELECT)    // ADD
-		RenderTeamSelect();                         // ADD
 
 	WindowManager::sInstance->display();
 }

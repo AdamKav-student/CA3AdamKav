@@ -102,6 +102,18 @@ bool ScoreBoardManager::Read(InputMemoryBitStream& inInputStream)
 {
 	int entryCount;
 	inInputStream.Read(entryCount);
+
+	//an entry can't be smaller than its fixed fields ( colour, player id, name length, score ), so a count
+	//the rest of the packet couldn't possibly hold means we're reading misaligned garbage. resizing to it
+	//would throw straight out of the frame, so refuse it and leave the board we already have
+	const uint32_t minimumBitsPerEntry = 192;
+	if (entryCount < 0 ||
+		static_cast<uint32_t>(entryCount) > inInputStream.GetRemainingBitCount() / minimumBitsPerEntry)
+	{
+		LOG("Scoreboard claimed %d entries- ignoring it", entryCount);
+		return false;
+	}
+
 	//just replace everything that's here, it don't matter...
 	mEntries.resize(entryCount);
 	for (Entry& entry : mEntries)

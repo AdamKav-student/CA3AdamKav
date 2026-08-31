@@ -9,14 +9,7 @@
 enum MenuState
 {
     MENU_MAIN,
-    MENU_INSTRUCTIONS,
-    MENU_TEAM_SELECT
-};
-
-enum TankType
-{
-    TANK_SHERMAN,
-    TANK_PANZER
+    MENU_INSTRUCTIONS
 };
 
 struct Button
@@ -44,27 +37,19 @@ public:
     void AddButton(const sf::FloatRect& bounds, const std::string& textureKey, std::function<void()> onClick);
     void SetMenuState(MenuState state) { mCurrentState = state; }
     MenuState GetMenuState() const { return mCurrentState; }
-    void SelectTank(TankType inTank) { mSelectedTank = inTank; }
-    TankType GetSelectedTank() const { return mSelectedTank; }
 
 private:
     MenuManager();
 
     std::vector<Button> mMainMenuButtons;
     std::vector<Button> mInstructionsMenuButtons;
-    std::vector<Button> mTeamSelectButtons;
 
     sf::Sprite mBackgroundSprite;
     sf::Sprite mInstructionsBackgroundSprite;
     sf::Sprite mInstructionsSprite;
-    sf::Sprite mShermanPreviewSprite;
-    sf::Sprite mPanzerPreviewSprite;
-    sf::Sprite mMultiplayerIconSprite;
 
     MenuState mCurrentState;
-    TankType mSelectedTank;
 
     void RenderMainMenu();
     void RenderInstructions();
-    void RenderTeamSelect();
 };

@@ -16,6 +16,14 @@ SpriteComponent::~SpriteComponent()
 
 void SpriteComponent::SetTexture(TexturePtr inTexture)
 {
+	//TextureManager hands back an empty pointer for a texture that failed to load ( the asset
+	//paths are relative, so this happens whenever the working directory isn't what we expect )
+	if (!inTexture)
+	{
+		LOG("Tried to set a texture that isn't loaded- leaving this sprite as it was", 0);
+		return;
+	}
+
 	auto tSize = inTexture->getSize();
 	m_sprite.setTexture(*inTexture);
 	m_sprite.setOrigin(tSize.x / 2, tSize.y / 2);

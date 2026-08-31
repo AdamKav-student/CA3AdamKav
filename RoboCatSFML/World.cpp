@@ -25,6 +25,13 @@ void World::RemoveGameObject(GameObjectPtr inGameObject)
 {
 	int index = inGameObject->GetIndexInWorld();
 
+	//an object that's already out of the world carries index -1, and using that would write
+	//off the front of the vector rather than doing nothing
+	if (index < 0 || index >= static_cast<int>(mGameObjects.size()))
+	{
+		return;
+	}
+
 	int lastIndex = mGameObjects.size() - 1;
 	if (index != lastIndex)
 	{

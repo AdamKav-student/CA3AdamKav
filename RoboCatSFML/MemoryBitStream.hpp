@@ -140,6 +140,16 @@ public:
 	{
 		uint32_t elementCount;
 		Read(elementCount);
+
+		//a misaligned stream hands us a nonsense length, and resizing to it throws out of the frame
+		//before we ever get to notice the packet was bad. we can't read more characters than the
+		//packet has bits for, so clamp to that and let the caller deal with a short string
+		uint32_t availableElementCount = GetRemainingBitCount() >> 3;
+		if (elementCount > availableElementCount)
+		{
+			elementCount = availableElementCount;
+		}
+
 		inString.resize(elementCount);
 		for (auto& element : inString)
 		{

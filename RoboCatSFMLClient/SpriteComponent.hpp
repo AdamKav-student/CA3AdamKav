@@ -6,7 +6,8 @@ class SpriteComponent
 public:
 
 	SpriteComponent(GameObject* inGameObject);
-	~SpriteComponent();
+	//PlayerSpriteComponent and TurretSpriteComponent derive from this
+	virtual ~SpriteComponent();
 
 
 	void SetTexture(TexturePtr inTexture);
