@@ -35,6 +35,7 @@ bool Client::StaticInit()
 
 	HUD::StaticInit();
 	MenuManager::StaticInit();
+	GameStateManager::StaticInit();
 	InitAudio();
 
 	s_instance.reset(client);
@@ -107,9 +108,19 @@ void Client::DoFrame()
 
 		NetworkManagerClient::sInstance->ProcessIncomingPackets();
 
+		//the scoreboard we just read decides whether anyone has hit the kill goal
+		GameStateManager::sInstance->CheckForGameOver();
+		GameStateManager::sInstance->Update();
+
 		RenderManager::sInstance->Render();
 
 		NetworkManagerClient::sInstance->SendOutgoingPackets();
+
+		//the victory or defeat screen sits up for a few seconds and then we're done
+		if (GameStateManager::sInstance->ShouldCloseApplication())
+		{
+			Engine::s_instance->SetShouldKeepRunning(false);
+		}
 	}
 }
 

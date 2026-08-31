@@ -20,6 +20,7 @@ private:
 	void	RenderScoreBoard();
 	void	RenderHealth();
 	void	RenderKillCount();
+	void	RenderNetworkStats();
 	void	RenderText(const string& inStr, const Vector3& origin, const Vector3& inColor, int inCharacterSize = 50);
 	void	RenderTextCentered(const string& inStr, float inY, const Vector3& inColor, int inCharacterSize);
 

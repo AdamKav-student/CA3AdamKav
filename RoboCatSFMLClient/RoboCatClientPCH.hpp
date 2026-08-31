@@ -16,6 +16,7 @@
 
 #include "HUD.hpp"
 #include "MenuManager.hpp"
+#include "GameStateManager.hpp"
 
 #include "ReplicationManagerClient.hpp"
 #include "NetworkManagerClient.hpp"

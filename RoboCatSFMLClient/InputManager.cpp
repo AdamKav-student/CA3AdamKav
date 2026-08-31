@@ -92,6 +92,10 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 		if (inInputAction == EIA_Pressed)
 			PlayFireSoundIfOffCooldown();
 		break;
+	case sf::Keyboard::Tab:
+		//hold to see how the connection is doing
+		UpdateDesireVariableFromKey(inInputAction, mIsShowingNetworkStats);
+		break;
 	case sf::Keyboard::Add:
 	case sf::Keyboard::Equal:
 	{
@@ -124,6 +128,7 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 InputManager::InputManager() :
 	mNextTimeToSampleInput(0.f),
 	mTimeOfNextFireSound(0.f),
+	mIsShowingNetworkStats(false),
 	mPendingMove(nullptr)
 {
 

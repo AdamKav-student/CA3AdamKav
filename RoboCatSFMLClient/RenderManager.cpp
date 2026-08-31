@@ -88,6 +88,9 @@ void RenderManager::Render()
 
 	HUD::sInstance->Render();
 
+	//victory or defeat covers everything else, so it goes down last
+	GameStateManager::sInstance->Render();
+
 	//
 	// Present our back buffer to our front buffer
 	//

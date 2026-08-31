@@ -39,8 +39,8 @@ TextureManager::TextureManager()
 	CacheTexture("instructions_image", "../Assets/Control text.png");
 
 	//Victory/Defeat screens
-	CacheTexture("victory", "../Assets/Victory.png");
-	CacheTexture("defeat", "../Assets/Defeat.png");
+	CacheTexture("victory", "../Assets/Victory Image.png");
+	CacheTexture("defeat", "../Assets/Defeat Image.png");
 }
 
 TexturePtr	TextureManager::GetTexture(const string& inTextureName)

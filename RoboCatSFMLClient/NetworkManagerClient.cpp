@@ -37,6 +37,7 @@ void NetworkManagerClient::Init(const SocketAddress& inServerAddress, const stri
 	mName = inName;
 
 	mAvgRoundTripTime = WeightedTimedMovingAverage(1.f);
+	mStatePacketsPerSecond = WeightedTimedMovingAverage(1.f);
 }
 
 void NetworkManagerClient::ProcessPacket(InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress)
@@ -51,6 +52,8 @@ void NetworkManagerClient::ProcessPacket(InputMemoryBitStream& inInputStream, co
 	case kStateCC:
 		if (mDeliveryNotificationManager.ReadAndProcessState(inInputStream))
 		{
+			//one accepted state packet is one server tick as far as we can tell from here
+			mStatePacketsPerSecond.UpdatePerSecond(1.f);
 			HandleStatePacket(inInputStream);
 		}
 		break;

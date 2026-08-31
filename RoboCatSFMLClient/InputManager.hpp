@@ -8,6 +8,10 @@ public:
 
 	const InputState& GetState()	const { return mCurrentState; }
 
+	//held, not toggled- the network panel shows for as long as Tab is down. this is local to
+	//this client, so unlike the movement keys it never goes into a move
+	bool IsShowingNetworkStats()	const { return mIsShowingNetworkStats; }
+
 	MoveList& GetMoveList() { return mMoveList; }
 
 	const Move* GetAndClearPendingMove() { auto toRet = mPendingMove; mPendingMove = nullptr; return toRet; }
@@ -29,6 +33,7 @@ private:
 	MoveList		mMoveList;
 	float			mNextTimeToSampleInput;
 	float			mTimeOfNextFireSound;
+	bool			mIsShowingNetworkStats;
 	const Move* mPendingMove;
 };
 

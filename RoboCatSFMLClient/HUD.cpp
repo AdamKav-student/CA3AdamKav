@@ -29,6 +29,83 @@ void HUD::Render()
 	RenderScoreBoard();
 	RenderHealth();
 	RenderKillCount();
+	RenderNetworkStats();
+}
+
+void HUD::RenderNetworkStats()
+{
+	//held on Tab, like a scoreboard key in most shooters
+	if (!InputManager::sInstance->IsShowingNetworkStats())
+	{
+		return;
+	}
+
+	const DeliveryNotificationManager& dnm = NetworkManagerClient::sInstance->GetDeliveryNotificationManager();
+
+	uint32_t dispatched = dnm.GetDispatchedPacketCount();
+	uint32_t delivered = dnm.GetDeliveredPacketCount();
+	uint32_t dropped = dnm.GetDroppedPacketCount();
+
+	//these are only meaningful once we've actually sent something
+	int deliveredPercent = dispatched > 0 ? static_cast<int>((100 * delivered) / dispatched) : 0;
+	int droppedPercent = dispatched > 0 ? static_cast<int>((100 * dropped) / dispatched) : 0;
+
+	float deltaTime = Timing::sInstance.GetDeltaTime();
+	int clientFps = deltaTime > 0.f ? static_cast<int>(1.f / deltaTime) : 0;
+
+	//how far behind the server is on our input- the gap between the move it last acknowledged
+	//and where our clock is now, plus how many moves are still waiting on an acknowledgement
+	float moveLag = Timing::sInstance.GetFrameStartTime() -
+		NetworkManagerClient::sInstance->GetLastMoveProcessedByServerTimestamp();
+	int pendingMoves = InputManager::sInstance->GetMoveList().GetMoveCount();
+
+	vector< string > lines;
+	lines.push_back("SERVER");
+	lines.push_back(StringUtils::Sprintf("  tick rate         %d /s", static_cast<int>(NetworkManagerClient::sInstance->GetServerTickRate())));
+	lines.push_back(StringUtils::Sprintf("  players           %d", static_cast<int>(ScoreBoardManager::sInstance->GetEntries().size())));
+	lines.push_back(StringUtils::Sprintf("  you are player    %d", NetworkManagerClient::sInstance->GetPlayerId()));
+	lines.push_back("");
+	lines.push_back("SYNCHRONISATION");
+	lines.push_back(StringUtils::Sprintf("  round trip        %d ms", static_cast<int>(NetworkManagerClient::sInstance->GetRoundTripTime() * 1000.f)));
+	lines.push_back(StringUtils::Sprintf("  server behind by  %d ms", static_cast<int>(moveLag * 1000.f)));
+	lines.push_back(StringUtils::Sprintf("  moves unacked     %d", pendingMoves));
+	lines.push_back(StringUtils::Sprintf("  simulated latency %d ms", static_cast<int>(NetworkManagerClient::sInstance->GetSimulatedLatency() * 1000.f)));
+	lines.push_back("");
+	lines.push_back("PACKETS");
+	lines.push_back(StringUtils::Sprintf("  sent              %u", dispatched));
+	lines.push_back(StringUtils::Sprintf("  delivered         %d%%", deliveredPercent));
+	lines.push_back(StringUtils::Sprintf("  dropped           %d%%", droppedPercent));
+	lines.push_back(StringUtils::Sprintf("  in                %d B/s", static_cast<int>(NetworkManagerClient::sInstance->GetBytesReceivedPerSecond().GetValue())));
+	lines.push_back(StringUtils::Sprintf("  out               %d B/s", static_cast<int>(NetworkManagerClient::sInstance->GetBytesSentPerSecond().GetValue())));
+	lines.push_back("");
+	lines.push_back("CLIENT");
+	lines.push_back(StringUtils::Sprintf("  frame rate        %d fps", clientFps));
+
+	const int characterSize = 22;
+	const float lineHeight = 26.f;
+	const float panelWidth = 420.f;
+	float panelHeight = lines.size() * lineHeight + 24.f;
+
+	sf::Vector2f viewSize = WindowManager::sInstance->getView().getSize();
+	float panelX = (viewSize.x - panelWidth) * 0.5f;
+	float panelY = 70.f;
+
+	//a dark panel so the text stays readable over whatever is on screen
+	sf::RectangleShape panel(sf::Vector2f(panelWidth, panelHeight));
+	panel.setPosition(panelX, panelY);
+	panel.setFillColor(sf::Color(0, 0, 0, 200));
+	panel.setOutlineColor(sf::Color(255, 255, 255, 90));
+	panel.setOutlineThickness(2.f);
+	WindowManager::sInstance->draw(panel);
+
+	Vector3 origin(panelX + 16.f, panelY + 12.f, 0.f);
+	for (const string& line : lines)
+	{
+		//headings in white, the numbers under them dimmer
+		bool isHeading = !line.empty() && line[0] != ' ';
+		RenderText(line, origin, isHeading ? Colors::White : Colors::LightBlue, characterSize);
+		origin.mY += lineHeight;
+	}
 }
 
 void HUD::RenderKillCount()
