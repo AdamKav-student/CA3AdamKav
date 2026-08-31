@@ -6,6 +6,8 @@
 #include <functional>
 #include <string>
 
+#include "TankType.hpp"
+
 enum MenuState
 {
     MENU_MAIN,
@@ -13,11 +15,8 @@ enum MenuState
     MENU_TEAM_SELECT
 };
 
-enum TankType
-{
-    TANK_SHERMAN,
-    TANK_PANZER
-};
+//TankType used to be declared here as well as in TankType.hpp, and the client PCH pulls in both-
+//that is a redefinition, so the one definition now lives in TankType.hpp
 
 struct Button
 {

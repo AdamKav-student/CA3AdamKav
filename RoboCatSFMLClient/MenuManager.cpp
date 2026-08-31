@@ -4,7 +4,7 @@
 
 std::unique_ptr<MenuManager> MenuManager::sInstance;
 
-void MenuManager::SelectTank(TankType inTank) { mSelectedTank = inTank; }
+//SelectTank is already defined inline in MenuManager.hpp- defining it again here is a redefinition
 
 MenuManager::MenuManager()
 	: mCurrentState(MENU_MAIN),
@@ -80,7 +80,7 @@ MenuManager::MenuManager()
 	}
 
 	// Sherman preview sprite
-	TexturePtr shermanTex = TextureManager::sInstance->GetTexture("cat");
+	TexturePtr shermanTex = TextureManager::sInstance->GetTexture("sherman");
 	if (shermanTex)
 	{
 		mShermanPreviewSprite.setTexture(*shermanTex);

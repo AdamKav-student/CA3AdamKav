@@ -6,27 +6,33 @@ TankType RoboCatClient::sLocalTankType = TANK_SHERMAN;
 RoboCatClient::RoboCatClient() :
 	mTimeLocationBecameOutOfSync(0.f),
 	mTimeVelocityBecameOutOfSync(0.f),
-	mTurretComponent(nullptr)
+	mTankType(TANK_SHERMAN)
 {
-	// Safe null check for unique_ptr
-	TankType selectedTank = TANK_SHERMAN;
-	if (MenuManager::sInstance.get() != nullptr)
-		selectedTank = MenuManager::sInstance->GetSelectedTank();
-
-	string bodyTex = (sLocalTankType == TANK_PANZER) ? "panzer" : "cat";
-	string turretTex = (sLocalTankType == TANK_PANZER) ? "panzer_turret" : "cat_turret";
-
-
 	mSpriteComponent.reset(new PlayerSpriteComponent(this));
-	mSpriteComponent->SetTexture(TextureManager::sInstance->GetTexture(bodyTex));
 	mSpriteComponent->SetDrawOrder(5);
 
-	// Add turret component
-	mTurretComponent = new TurretSpriteComponent(this);
-	mTurretComponent->SetTexture(TextureManager::sInstance->GetTexture(turretTex));
+	// Add turret component. This has to be held by a shared_ptr like the body is: as a raw
+	// new with no destructor to match it, the component outlived the tank it belongs to and
+	// stayed registered with the RenderManager, which then drew through a dangling pointer
+	// into freed memory the moment anyone was killed.
+	mTurretComponent.reset(new TurretSpriteComponent(this));
 	mTurretComponent->SetOffset(Vector3(0.f, -10.f, 0.f));
-	mTurretComponent->SetOriginYOffset(20.f);
 	mTurretComponent->SetDrawOrder(6);
+
+	// We don't know who this tank belongs to yet- the player id arrives with the first
+	// replicated state. Start on the first model and switch in Read once we're told.
+	ApplyTankTextures(mTankType);
+}
+
+void RoboCatClient::ApplyTankTextures(TankType inTankType)
+{
+	mTankType = inTankType;
+
+	mSpriteComponent->SetTexture(TextureManager::sInstance->GetTexture(GetTankBodyTextureName(inTankType)));
+
+	mTurretComponent->SetTexture(TextureManager::sInstance->GetTexture(GetTankTurretTextureName(inTankType)));
+	// re-run the origin adjustment against the new texture's size
+	mTurretComponent->SetOriginYOffset(20.f);
 }
 
 void RoboCatClient::HandleDying()
@@ -87,6 +93,14 @@ void RoboCatClient::Read(InputMemoryBitStream& inInputStream)
 		inInputStream.Read(playerId);
 		SetPlayerId(playerId);
 		readState |= ECRS_PlayerId;
+
+		// now we know who this tank belongs to we can give it the right model: player 1 drives
+		// a Sherman, player 2 a Panzer IV, and every new player carries on alternating
+		TankType tankTypeForPlayer = GetTankTypeForPlayerId(playerId);
+		if (tankTypeForPlayer != mTankType)
+		{
+			ApplyTankTextures(tankTypeForPlayer);
+		}
 	}
 
 	float oldRotation = GetRotation();

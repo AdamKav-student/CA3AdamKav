@@ -23,10 +23,17 @@ protected:
 
 private:
 	void InterpolateClientSidePrediction(float inOldRotation, const Vector3& inOldLocation, const Vector3& inOldVelocity, bool inIsForRemoteCat);
+
+	//which tank this player drives falls out of their player id, so we can only pick the real
+	//model once the id has replicated in- see ApplyTankTextures
+	void ApplyTankTextures(TankType inTankType);
+
 	float			mTimeLocationBecameOutOfSync;
 	float			mTimeVelocityBecameOutOfSync;
 
 	SpriteComponentPtr	mSpriteComponent;
-	TurretSpriteComponent* mTurretComponent; // owned
+	TurretSpriteComponentPtr mTurretComponent;
+
+	TankType		mTankType;
 };
 

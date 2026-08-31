@@ -10,8 +10,8 @@ void TextureManager::StaticInit()
 TextureManager::TextureManager()
 {
 	//Model for Allied Team Chassis and Turret
-	CacheTexture("cat", "../Assets/Sherman B.png");
-	CacheTexture("cat_turret", "../Assets/Sherman T.png");
+	CacheTexture("sherman", "../Assets/Sherman B.png");
+	CacheTexture("sherman_turret", "../Assets/Sherman T.png");
 	
 
 	//Model for Axis Team Chassis and Turret

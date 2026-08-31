@@ -14,3 +14,5 @@ private:
     float mOriginYOffset = 0.f;
     bool mOriginAdjusted = false;
 };
+
+typedef shared_ptr< TurretSpriteComponent >	TurretSpriteComponentPtr;
