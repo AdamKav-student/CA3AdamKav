@@ -17,6 +17,7 @@ public:
 private:
 
 	void CheckAndStopTankTracks();
+	void PlayFireSoundIfOffCooldown();
 
 	InputState							mCurrentState;
 
@@ -27,6 +28,7 @@ private:
 
 	MoveList		mMoveList;
 	float			mNextTimeToSampleInput;
+	float			mTimeOfNextFireSound;
 	const Move* mPendingMove;
 };
 

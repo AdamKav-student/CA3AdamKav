@@ -2,6 +2,9 @@ class ScoreBoardManager
 {
 public:
 
+	//a player's score is their kill count, so this is how many kills ends the game
+	static const int kKillsToWin = 10;
+
 	static void StaticInit();
 	static std::unique_ptr< ScoreBoardManager >	sInstance;
 

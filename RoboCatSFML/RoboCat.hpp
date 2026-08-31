@@ -14,6 +14,11 @@ public:
 	};
 
 
+	//how long a tank has to wait between shots, in seconds. the server is what actually enforces
+	//it, but the client needs it as well so it doesn't play a firing sound for a shot that the
+	//server is still going to refuse
+	static const float kTimeBetweenShots;
+
 	static	GameObject* StaticCreate() { return new RoboCat(); }
 
 	virtual uint32_t GetAllStateMask()	const override { return ECRS_AllState; }

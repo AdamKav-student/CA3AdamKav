@@ -3,7 +3,9 @@
 RoboCatServer::RoboCatServer() :
 	mCatControlType(ESCT_Human),
 	mTimeOfNextShot(0.f),
-	mTimeBetweenShots(0.2f)
+	//the server is what actually enforces the delay- a client holding the fire key down still
+	//only gets a shell every kTimeBetweenShots
+	mTimeBetweenShots(RoboCat::kTimeBetweenShots)
 {}
 
 void RoboCatServer::HandleDying()

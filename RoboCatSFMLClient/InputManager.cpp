@@ -86,10 +86,11 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 			mCurrentState.mDesiredTurretAmount = 0.f;
 		break;
 
-	case sf::Keyboard::K:
+	case sf::Keyboard::Space:
+	case sf::Keyboard::Enter:
 		UpdateDesireVariableFromKey(inInputAction, mCurrentState.mIsShooting);
 		if (inInputAction == EIA_Pressed)
-			AudioManager::Instance().PlaySoundEffect(SoundEffect::WeaponFire);
+			PlayFireSoundIfOffCooldown();
 		break;
 	case sf::Keyboard::Add:
 	case sf::Keyboard::Equal:
@@ -122,9 +123,24 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 
 InputManager::InputManager() :
 	mNextTimeToSampleInput(0.f),
+	mTimeOfNextFireSound(0.f),
 	mPendingMove(nullptr)
 {
 
+}
+
+void InputManager::PlayFireSoundIfOffCooldown()
+{
+	//holding the key down repeats KeyPressed, and the server only gives us a shell every
+	//kTimeBetweenShots, so without this we'd play a firing sound for shots that never happen
+	float time = Timing::sInstance.GetFrameStartTime();
+	if (time < mTimeOfNextFireSound)
+	{
+		return;
+	}
+
+	mTimeOfNextFireSound = time + RoboCat::kTimeBetweenShots;
+	AudioManager::Instance().PlaySoundEffect(SoundEffect::WeaponFire);
 }
 
 const Move& InputManager::SampleInputAsMove()
