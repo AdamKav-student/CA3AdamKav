@@ -76,6 +76,26 @@ void RoboCatServer::HandleShooting()
 	}
 }
 
+bool RoboCatServer::Heal(int inAmount)
+{
+	//nothing to do for a tank that's already dying, or already topped up
+	if (DoesWantToDie() || mHealth >= kMaxHealth)
+	{
+		return false;
+	}
+
+	mHealth += inAmount;
+	if (mHealth > kMaxHealth)
+	{
+		mHealth = kMaxHealth;
+	}
+
+	//tell the world our health went up
+	NetworkManagerServer::sInstance->SetStateDirty(GetNetworkId(), ECRS_Health);
+
+	return true;
+}
+
 void RoboCatServer::TakeDamage(int inDamagingPlayerId)
 {
 	//two projectiles can land in the same frame- we're not removed from the world until the end of it,

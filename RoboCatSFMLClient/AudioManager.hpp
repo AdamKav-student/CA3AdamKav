@@ -33,11 +33,22 @@ public:
     void SetMusicVolume(float volume);
     void SetSFXVolume(float volume);
 
+    //mute is local to this client- it silences what you hear and nothing else
+    void ToggleMute() { SetMuted(!mMuted); }
+    void SetMuted(bool inMuted);
+    bool IsMuted() const { return mMuted; }
+
 private:
     AudioManager() = default;
+
+    //everything that sets a volume goes through here so muting can't be undone by a later
+    //volume change, and unmuting restores whatever the volumes were
+    void ApplyVolumes();
 
     std::unordered_map<SoundEffect, sf::SoundBuffer> mBuffers;
     std::unordered_map<SoundEffect, sf::Sound>       mSounds;
     sf::Music                                         mMusic;
     float                                             mSFXVolume = 100.f;
+    float                                             mMusicVolume = 100.f;
+    bool                                              mMuted = false;
 };

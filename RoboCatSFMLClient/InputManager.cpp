@@ -92,6 +92,18 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 		if (inInputAction == EIA_Pressed)
 			PlayFireSoundIfOffCooldown();
 		break;
+	case sf::Keyboard::M:
+		//toggle on the press, not the release, so holding it doesn't flicker
+		if (inInputAction == EIA_Pressed && !mIsMuteKeyDown)
+		{
+			AudioManager::Instance().ToggleMute();
+			mIsMuteKeyDown = true;
+		}
+		else if (inInputAction == EIA_Released)
+		{
+			mIsMuteKeyDown = false;
+		}
+		break;
 	case sf::Keyboard::Tab:
 		//hold to see how the connection is doing
 		UpdateDesireVariableFromKey(inInputAction, mIsShowingNetworkStats);
@@ -129,6 +141,7 @@ InputManager::InputManager() :
 	mNextTimeToSampleInput(0.f),
 	mTimeOfNextFireSound(0.f),
 	mIsShowingNetworkStats(false),
+	mIsMuteKeyDown(false),
 	mPendingMove(nullptr)
 {
 

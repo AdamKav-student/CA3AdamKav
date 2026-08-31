@@ -13,10 +13,12 @@ void MouseServer::HandleDying()
 
 bool MouseServer::HandleCollisionWithCat(RoboCat* inCat)
 {
-	//kill yourself!
-	SetDoesWantToDie(true);
-
-	ScoreBoardManager::sInstance->IncScore(inCat->GetPlayerId(), 1);
+	//a barrel is a pickup, not a kill- only shooting another player scores. we only consume it
+	//if it actually healed someone, so driving over one at full health doesn't waste it
+	if (static_cast<RoboCatServer*>(inCat)->Heal(1))
+	{
+		SetDoesWantToDie(true);
+	}
 
 	return false;
 }
