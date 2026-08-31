@@ -19,13 +19,17 @@ private:
 	void	RenderRoundTripTime();
 	void	RenderScoreBoard();
 	void	RenderHealth();
-	void	RenderText(const string& inStr, const Vector3& origin, const Vector3& inColor);
+	void	RenderKillCount();
+	void	RenderNetworkStats();
+	void	RenderText(const string& inStr, const Vector3& origin, const Vector3& inColor, int inCharacterSize = 50);
+	void	RenderTextCentered(const string& inStr, float inY, const Vector3& inColor, int inCharacterSize);
 
 	Vector3										mBandwidthOrigin;
 	Vector3										mRoundTripTimeOrigin;
 	Vector3										mScoreBoardOrigin;
 	Vector3										mScoreOffset;
 	Vector3										mHealthOffset;
+	float										mKillCountY;
 	int											mHealth;
 };
 

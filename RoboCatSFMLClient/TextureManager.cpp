@@ -24,11 +24,11 @@ TextureManager::TextureManager()
 	//Projectile
 	CacheTexture("yarn", "../Assets/Bullet.png");
 
-	CacheTexture("background", "../Assets/background.png");
+	CacheTexture("background", "../Assets/Background.png");
 
 	//Menu backgrounds
 	CacheTexture("menu_background", "../Assets/Menu New.png");
-	CacheTexture("instructions_background", "../Assets/Settings new.png");
+	CacheTexture("instructions_background", "../Assets/Settings New.png");
 
 	//Menu button images
 	CacheTexture("button_play", "../Assets/Play.png");
@@ -39,8 +39,8 @@ TextureManager::TextureManager()
 	CacheTexture("instructions_image", "../Assets/Control text.png");
 
 	//Victory/Defeat screens
-	CacheTexture("victory", "../Assets/Victory.png");
-	CacheTexture("defeat", "../Assets/Defeat.png");
+	CacheTexture("victory", "../Assets/Victory Image.png");
+	CacheTexture("defeat", "../Assets/Defeat Image.png");
 }
 
 TexturePtr	TextureManager::GetTexture(const string& inTextureName)

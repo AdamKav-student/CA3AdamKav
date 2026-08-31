@@ -19,6 +19,10 @@ public:
     void Update();
     void Render();
 
+    //every client gets the same replicated scoreboard, so they all reach the same verdict
+    //without the server having to tell them separately
+    void CheckForGameOver();
+
     void SetGameState(EGameState inState);
     EGameState GetGameState() const { return mGameState; }
 
@@ -27,8 +31,7 @@ public:
 private:
     GameStateManager();
 
-    void LoadVictoryImage();
-    void LoadDefeatImage();
+    void LoadStateImage(const string& inTextureName);
 
     EGameState mGameState;
     float mStateStartTime;

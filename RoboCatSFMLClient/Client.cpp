@@ -3,21 +3,18 @@
 
 static void InitAudio()
 {
-	// TEMPORARY - log working directory
-	char buffer[512];
-	GetCurrentDirectoryA(512, buffer);
-	LOG("Working directory: %s", buffer);
-
 	auto& audio = AudioManager::Instance();
 	
-	audio.LoadSoundEffect(SoundEffect::ButtonClick, "C:/Users/PC/source/repos/BaseRoboCatUDP-master/GD4RoboCatSFML-master/Assets/Confirmation.wav");
-	audio.LoadSoundEffect(SoundEffect::PlayerMove, "C:/Users/PC/source/repos/BaseRoboCatUDP-master/GD4RoboCatSFML-master/Assets/Player_MoveNew.wav");
-	audio.LoadSoundEffect(SoundEffect::WeaponFire, "C:/Users/PC/source/repos/BaseRoboCatUDP-master/GD4RoboCatSFML-master/Assets/Player_Fire.wav");
-	audio.LoadSoundEffect(SoundEffect::ItemCollect, "C:/Users/PC/source/repos/BaseRoboCatUDP-master/GD4RoboCatSFML-master/Assets/Menu ping 1.wav");
-	audio.LoadSoundEffect(SoundEffect::HitLight, "C:/Users/PC/source/repos/BaseRoboCatUDP-master/GD4RoboCatSFML-master/Assets/Damage.wav");
-	audio.LoadSoundEffect(SoundEffect::HitHeavy, "C:/Users/PC/source/repos/BaseRoboCatUDP-master/GD4RoboCatSFML-master/Assets/Damage.wav");
-	audio.LoadSoundEffect(SoundEffect::Death, "C:/Users/PC/source/repos/BaseRoboCatUDP-master/GD4RoboCatSFML-master/Assets/Explosion2.wav");
-	audio.LoadMusic("C:/Users/PC/source/repos/BaseRoboCatUDP-master/GD4RoboCatSFML-master/Assets/Menu_Ambience.wav");
+	//relative to the working directory, the same way the textures and fonts are loaded. these
+	//used to be absolute paths into one machine's source tree, so audio was silent anywhere else
+	audio.LoadSoundEffect(SoundEffect::ButtonClick, "../Assets/Confirmation.wav");
+	audio.LoadSoundEffect(SoundEffect::PlayerMove, "../Assets/Player_MoveNew.wav");
+	audio.LoadSoundEffect(SoundEffect::WeaponFire, "../Assets/Player_Fire.wav");
+	audio.LoadSoundEffect(SoundEffect::ItemCollect, "../Assets/Menu ping 1.wav");
+	audio.LoadSoundEffect(SoundEffect::HitLight, "../Assets/Damage.wav");
+	audio.LoadSoundEffect(SoundEffect::HitHeavy, "../Assets/Damage.wav");
+	audio.LoadSoundEffect(SoundEffect::Death, "../Assets/Explosion2.wav");
+	audio.LoadMusic("../Assets/Menu_Ambience.wav");
 	audio.PlayMusic(true);
 	audio.SetMusicVolume(50.f);
 }
@@ -35,6 +32,7 @@ bool Client::StaticInit()
 
 	HUD::StaticInit();
 	MenuManager::StaticInit();
+	GameStateManager::StaticInit();
 	InitAudio();
 
 	s_instance.reset(client);
@@ -107,9 +105,19 @@ void Client::DoFrame()
 
 		NetworkManagerClient::sInstance->ProcessIncomingPackets();
 
+		//the scoreboard we just read decides whether anyone has hit the kill goal
+		GameStateManager::sInstance->CheckForGameOver();
+		GameStateManager::sInstance->Update();
+
 		RenderManager::sInstance->Render();
 
 		NetworkManagerClient::sInstance->SendOutgoingPackets();
+
+		//the victory or defeat screen sits up for a few seconds and then we're done
+		if (GameStateManager::sInstance->ShouldCloseApplication())
+		{
+			Engine::s_instance->SetShouldKeepRunning(false);
+		}
 	}
 }
 

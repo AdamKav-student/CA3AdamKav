@@ -14,6 +14,13 @@ public:
 		float time = Timing::sInstance.GetTimef();
 		float timeSinceLastEntry = time - mTimeLastEntryMade;
 
+		//two samples inside the clock's resolution would divide by zero and poison the average
+		//with an infinity that never washes out
+		if (timeSinceLastEntry <= 0.f)
+		{
+			return;
+		}
+
 		float valueOverTime = inValue / timeSinceLastEntry;
 
 		//now update our value by whatever amount of the duration that was..

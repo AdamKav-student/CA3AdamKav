@@ -3,10 +3,14 @@
 const float WORLD_HEIGHT = 1500.f;
 const float WORLD_WIDTH = 2500.f;
 
+const float RoboCat::kTimeBetweenShots = 1.0f;
+
 RoboCat::RoboCat() :
 	GameObject(),
-	mMaxRotationSpeed(100.f),
-	mMaxLinearSpeed(5000.f),
+	//tanks are meant to feel heavy- these were 100 and 5000, which drove them across the
+	//screen faster than the turret could keep up with
+	mMaxRotationSpeed(70.f),
+	mMaxLinearSpeed(2000.f),
 	mVelocity(Vector3::Zero),
 	mWallRestitution(0.1f),
 	mCatRestitution(0.1f),

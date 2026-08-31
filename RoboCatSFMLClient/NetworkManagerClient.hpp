@@ -18,6 +18,11 @@ public:
 
 	const	WeightedTimedMovingAverage& GetAvgRoundTripTime()	const { return mAvgRoundTripTime; }
 	float									GetRoundTripTime()		const { return mAvgRoundTripTime.GetValue(); }
+
+	//how many state packets a second the server is actually getting to us. we can't read the
+	//server's own tick rate, so this is it measured from this end
+	float	GetServerTickRate()				const { return mStatePacketsPerSecond.GetValue(); }
+	const	DeliveryNotificationManager& GetDeliveryNotificationManager()	const { return mDeliveryNotificationManager; }
 	int		GetPlayerId()											const { return mPlayerId; }
 	float	GetLastMoveProcessedByServerTimestamp()					const { return mLastMoveProcessedByServerTimestamp; }
 private:
@@ -56,6 +61,7 @@ private:
 	float				mLastMoveProcessedByServerTimestamp;
 
 	WeightedTimedMovingAverage	mAvgRoundTripTime;
+	WeightedTimedMovingAverage	mStatePacketsPerSecond;
 	float						mLastRoundTripTime;
 
 };
