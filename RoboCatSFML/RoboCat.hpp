@@ -19,6 +19,10 @@ public:
 	//server is still going to refuse
 	static const float kTimeBetweenShots;
 
+	//the most health a tank can have, and what it spawns with. health is replicated in four
+	//bits, so this has to stay under 16
+	static const int kMaxHealth = 4;
+
 	static	GameObject* StaticCreate() { return new RoboCat(); }
 
 	virtual uint32_t GetAllStateMask()	const override { return ECRS_AllState; }

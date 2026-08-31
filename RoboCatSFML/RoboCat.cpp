@@ -17,7 +17,7 @@ RoboCat::RoboCat() :
 	mThrustDir(0.f),
 	mPlayerId(0),
 	mIsShooting(false),
-	mHealth(10),
+	mHealth(kMaxHealth),
 	mTurretRotation(0.f),
 	mMaxTurretRotationSpeed(90.f)
 {

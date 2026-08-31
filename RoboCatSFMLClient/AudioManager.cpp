@@ -14,7 +14,8 @@ void AudioManager::LoadSoundEffect(SoundEffect effect, const std::string& filepa
 	}
 	mBuffers[effect] = std::move(buffer);
 	mSounds[effect].setBuffer(mBuffers[effect]);
-	mSounds[effect].setVolume(mSFXVolume);
+	//a sound loaded while muted has to come in silent too
+	mSounds[effect].setVolume(mMuted ? 0.f : mSFXVolume);
 }
 
 void AudioManager::PlaySoundEffect(SoundEffect effect) {
@@ -64,10 +65,27 @@ void AudioManager::PlayMusic(bool loop) {
 
 void AudioManager::StopMusic() { mMusic.stop(); }
 
-void AudioManager::SetMusicVolume(float volume) { mMusic.setVolume(volume); }
+void AudioManager::SetMusicVolume(float volume) {
+	mMusicVolume = volume;
+	ApplyVolumes();
+}
 
 void AudioManager::SetSFXVolume(float volume) {
 	mSFXVolume = volume;
+	ApplyVolumes();
+}
+
+void AudioManager::SetMuted(bool inMuted) {
+	mMuted = inMuted;
+	ApplyVolumes();
+}
+
+void AudioManager::ApplyVolumes() {
+	//muting drops everything to zero without forgetting the volumes to come back to
+	float sfxVolume = mMuted ? 0.f : mSFXVolume;
+
 	for (auto it = mSounds.begin(); it != mSounds.end(); ++it)
-		it->second.setVolume(volume);
+		it->second.setVolume(sfxVolume);
+
+	mMusic.setVolume(mMuted ? 0.f : mMusicVolume);
 }

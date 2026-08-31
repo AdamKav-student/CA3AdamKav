@@ -169,7 +169,7 @@ void RoboCatClient::Read(InputMemoryBitStream& inInputStream)
 			// Two damage sounds: heavy hit at low health, light hit otherwise
 			if (mHealth > 0)
 			{
-				if (mHealth <= 3)
+				if (mHealth <= 1)
 					AudioManager::Instance().PlaySoundEffect(SoundEffect::HitHeavy);
 				else
 					AudioManager::Instance().PlaySoundEffect(SoundEffect::HitLight);

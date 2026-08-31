@@ -16,6 +16,9 @@ public:
 
 	void TakeDamage(int inDamagingPlayerId);
 
+	//returns whether any health was actually restored- false when already at the cap
+	bool Heal(int inAmount);
+
 protected:
 	RoboCatServer();
 

@@ -34,6 +34,8 @@ private:
 	float			mNextTimeToSampleInput;
 	float			mTimeOfNextFireSound;
 	bool			mIsShowingNetworkStats;
+	//key repeat sends KeyPressed over and over while M is held, and we only want one toggle
+	bool			mIsMuteKeyDown;
 	const Move* mPendingMove;
 };
 
