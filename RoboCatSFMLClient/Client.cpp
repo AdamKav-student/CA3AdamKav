@@ -3,11 +3,6 @@
 
 static void InitAudio()
 {
-	// TEMPORARY - log working directory
-	char buffer[512];
-	GetCurrentDirectoryA(512, buffer);
-	LOG("Working directory: %s", buffer);
-
 	auto& audio = AudioManager::Instance();
 	
 	//relative to the working directory, the same way the textures and fonts are loaded. these
