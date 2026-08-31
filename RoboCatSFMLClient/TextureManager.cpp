@@ -24,11 +24,11 @@ TextureManager::TextureManager()
 	//Projectile
 	CacheTexture("yarn", "../Assets/Bullet.png");
 
-	CacheTexture("background", "../Assets/background.png");
+	CacheTexture("background", "../Assets/Background.png");
 
 	//Menu backgrounds
 	CacheTexture("menu_background", "../Assets/Menu New.png");
-	CacheTexture("instructions_background", "../Assets/Settings new.png");
+	CacheTexture("instructions_background", "../Assets/Settings New.png");
 
 	//Menu button images
 	CacheTexture("button_play", "../Assets/Play.png");
