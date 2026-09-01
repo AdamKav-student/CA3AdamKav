@@ -1,3 +1,4 @@
+[MDP-Repeat-CA3_AdamKavanagh.txt](https://github.com/user-attachments/files/31691543/MDP-Repeat-CA3_AdamKavanagh.txt)
 # CA 3 MDP Armoured Warfare -
 
 This is my submission for CA 3 (SINCE RESUBMITTED) Adam Kavanagh 
@@ -28,4 +29,8 @@ Audio
 
 Code for project has been based from in class example and developed using claude
 
-Link to screencast: TBR (To be recoreded)
+Video link:
+https://studentdkit-my.sharepoint.com/:v:/g/personal/d00247069_student_dkit_ie/IQD7fG8s97HOTbQziGhVSZsYAZfBG0e5-V8TM0QUAxkVRnQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=jo7X4U 
+
+Coversheet:
+https://studentdkit-my.sharepoint.com/:w:/g/personal/d00247069_student_dkit_ie/IQCYVxUTetXoT44G4U3rGQhwASVcU8h094dIiJMnNLpSai0?e=mhNsHC
